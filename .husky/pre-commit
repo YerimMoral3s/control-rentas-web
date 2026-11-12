@@ -1,0 +1,3 @@
+yarn typecheck
+yarn knip:deps
+yarn lint-staged

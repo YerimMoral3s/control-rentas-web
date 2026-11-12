@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Símbolo maestro de Rentario</title>
+  <desc id="desc">Una letra R azul cuya apertura inferior forma una puerta con perilla.</desc>
+  <path fill="#2452C8" fill-rule="evenodd" d="
+    M13.2 4
+    H40.4
+    C49.4 4 56.4 10.7 56.4 19.9
+    C56.4 28.1 52 34.7 44.6 39
+    L56.2 53.8
+    C58.2 56.3 56.7 59.5 54.4 59.5
+    H44.6
+    L30.2 39.5
+    H21
+    V60
+    H9.8
+    C8.6 60 7.6 59 7.6 57.8
+    V9.7
+    C7.6 6.5 10.1 4 13.2 4
+    Z
+
+    M21 14.3
+    V29.7
+    H37.4
+    C40.9 29.7 43.1 26.4 43.1 22
+    C43.1 17.5 39.6 14.3 33 14.3
+    H21
+    Z
+  "/>
+  <circle cx="28.5" cy="50.5" r="3" fill="#2452C8"/>
+</svg>
