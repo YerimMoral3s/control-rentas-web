@@ -16,13 +16,13 @@ yarn install
 cp .env.example .env
 ```
 
-| Variable            | Para qué                              | Local                      |
-| ------------------- | ------------------------------------- | -------------------------- |
-| `VITE_API_BASE_URL` | URL base de la API, ya incluye `/v1`. | `http://localhost:3000/v1` |
+| Variable            | Para qué                              | Local                                               |
+| ------------------- | ------------------------------------- | --------------------------------------------------- |
+| `VITE_API_BASE_URL` | URL base de la API, ya incluye `/v1`. | `/v1` (proxy de Vite hacia `http://localhost:3000`) |
 
 No hay secretos en el frontend. Nunca se escriben credenciales en código, documentación ni Git.
 
-El backend debe aceptar el origen del frontend: agrega `http://localhost:5173` a `CORS_ALLOWED_ORIGINS` en el `.env` del backend.
+En desarrollo, Vite reenvía `/v1` al backend local, por lo que no hace falta CORS. Si apuntas `VITE_API_BASE_URL` directo a `http://localhost:3000/v1`, el backend debe incluir `http://localhost:5173` en `CORS_ALLOWED_ORIGINS`.
 
 ## Ejecutar
 

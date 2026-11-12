@@ -14,6 +14,13 @@ const SearchControl = styled(Control)`
   input::placeholder {
     color: ${({ theme }) => theme.color.neutral500};
   }
+
+  /* El navegador agrega su propia "x" en type="search"; se usa solo la de F-03. */
+  input::-webkit-search-cancel-button,
+  input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
 `;
 
 const ClearButton = styled.button`

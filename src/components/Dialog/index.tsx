@@ -78,6 +78,16 @@ export function Dialog({ open, title, onClose, busy = false, children }: DialogP
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
+  // Mientras el diálogo está abierto, la página de fondo no se desplaza.
+  useEffect(() => {
+    if (!open) return;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [open]);
+
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog || typeof dialog.showModal !== 'function') return;

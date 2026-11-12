@@ -157,7 +157,7 @@ export function FundamentalsPage() {
             label="Renta mensual"
             prefix="$"
             suffix="MXN"
-            inputMode="decimal"
+            format="money"
             defaultValue="8,500"
           />
           <TextField label="Fecha de vencimiento" type="date" />
@@ -173,6 +173,7 @@ export function FundamentalsPage() {
           />
           <TextField
             label="Teléfono del inquilino"
+            format="phone"
             defaultValue="55 123"
             error="Escribe los 10 dígitos. Ejemplo: 55 1234 5678."
           />

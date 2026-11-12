@@ -20,6 +20,8 @@ export const router = createBrowserRouter([
   {
     element: <AppShell />,
     errorElement: <AppErrorScreen />,
+    // La galería de desarrollo se carga en diferido; mientras tanto no se muestra nada extra.
+    HydrateFallback: () => null,
     children: [
       { index: true, element: <PendingScreen title="Inicio" /> },
       { path: 'inquilinos', element: <PendingScreen title="Inquilinos" /> },
