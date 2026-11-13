@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 import { Icon, type IconName } from '../Icon';
 import { Spinner, StyledButton, type ButtonVariant } from './styles';
 
-type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
+type ButtonProps = Omit<ComponentPropsWithRef<'button'>, 'children'> & {
   variant?: ButtonVariant;
   icon?: IconName;
   /** Mientras guarda: deshabilita y muestra `loadingLabel` (por defecto "Guardando…"). */

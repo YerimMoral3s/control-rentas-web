@@ -23,15 +23,19 @@ const Option = styled.label<{ $selected: boolean }>`
   gap: 6px;
   padding: 0 8px;
   border-radius: ${({ theme }) => theme.radius.control};
-  border: ${({ $selected, theme }) =>
-    $selected ? `2px solid ${theme.color.primary600}` : `1px solid ${theme.color.neutral300}`};
+  /* Borde siempre de 1 px: el seleccionado suma un trazo interior para no mover el contenido. */
+  border: 1px solid
+    ${({ $selected, theme }) => ($selected ? theme.color.primary600 : theme.color.neutral300)};
+  box-shadow: ${({ $selected, theme }) => ($selected ? `inset 0 0 0 1px ${theme.color.primary600}` : 'none')};
   background: ${({ $selected, theme }) => ($selected ? theme.color.primary100 : theme.color.white)};
   color: ${({ $selected, theme }) => ($selected ? theme.color.primary700 : theme.color.neutral700)};
   font-size: 15px;
   font-weight: ${({ $selected }) => ($selected ? 700 : 600)};
+  white-space: nowrap;
   cursor: pointer;
 
-  &:focus-within {
+  /* El anillo de foco solo aparece al navegar con teclado, no al hacer clic. */
+  &:has(input:focus-visible) {
     outline: ${({ theme }) => theme.focusRing};
     outline-offset: 2px;
   }

@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
+import { Notice } from '@components';
 import { media } from '@styles/theme';
 import { BottomNav } from './BottomNav';
 import { Sidebar } from './Sidebar';
@@ -29,13 +31,43 @@ const Content = styled.div`
   margin: 0 auto;
 `;
 
+const ReturnNotice = styled.div`
+  margin-bottom: 20px;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+type AppShellProps = {
+  /** Sesión vencida: el contenido sigue visible pero inerte detrás de G-03. */
+  blocked: boolean;
+  /** Se volvió a entrar con la misma cuenta. */
+  returned: boolean;
+  onDismissReturned: () => void;
+};
+
 /** Marco con navegación: barra inferior en celular (F-09) y barra lateral en computadora (F-10). */
-export function AppShell() {
+export function AppShell({ blocked, returned, onDismissReturned }: AppShellProps) {
+  const noticeRef = useRef<HTMLDivElement>(null);
+
+  // G-03: al volver a entrar, el foco va al aviso "Volviste a entrar".
+  useEffect(() => {
+    if (returned) noticeRef.current?.focus();
+  }, [returned]);
+
   return (
-    <Layout>
+    <Layout inert={blocked} aria-hidden={blocked || undefined}>
       <Sidebar />
       <Main>
         <Content>
+          {returned ? (
+            <ReturnNotice ref={noticeRef} tabIndex={-1}>
+              <Notice tone="success" title="Volviste a entrar" onClose={onDismissReturned}>
+                Si estabas capturando algo, aún no se guardó. Revisa los datos y guarda de nuevo.
+              </Notice>
+            </ReturnNotice>
+          ) : null}
           <Outlet />
         </Content>
       </Main>

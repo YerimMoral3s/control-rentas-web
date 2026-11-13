@@ -50,6 +50,7 @@ const Title = styled.span`
 `;
 
 const Text = styled.span`
+  overflow-wrap: anywhere;
   font-size: 15px;
   line-height: 22px;
   color: ${({ theme }) => theme.color.neutral700};

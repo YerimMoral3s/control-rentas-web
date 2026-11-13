@@ -77,8 +77,11 @@ export const theme = {
     reduced: '80ms',
   },
   breakpoint: {
-    /** Composición de computadora: barra lateral y vistas rápidas. */
-    desktop: '1024px',
+    /**
+     * Composición de computadora (barra lateral, diálogos centrados, resumen expandido).
+     * El diseño define 390 y 1440 px; desde 768 px ya caben barra lateral y contenido (acuerdo del 12 nov.).
+     */
+    desktop: '768px',
   },
   focusRing: '3px solid #2452C8',
 } as const;
