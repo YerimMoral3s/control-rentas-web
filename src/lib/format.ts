@@ -21,3 +21,6 @@ export const formatPhone = (phone: string): string => {
   if (digits.length !== 10) return phone;
   return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
 };
+
+/** Importe con signo de la API ("-3200.00") con el signo menos tipográfico: "−$3,200". */
+export const formatSignedMoney = (amount: string): string => formatMoney(amount).replace(/^-/, '−');

@@ -30,6 +30,8 @@ export const QueryGcTime = {
 
 export const QueryPageSize = {
   standard: 20,
+  /** Máximo de la API; para relaciones que se cruzan con otra lista (p. ej. inquilino de cada unidad). */
+  max: 100,
 } as const;
 
 /** Igual que appv2: se conservan pocas páginas para no crecer sin límite. */

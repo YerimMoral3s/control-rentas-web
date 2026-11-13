@@ -1,5 +1,6 @@
 import { apiRequest } from './http';
 import type { ContractStatus, ContractType } from './contracts';
+import type { PropertyType } from './properties';
 import type { PaginatedMeta } from './types';
 
 /** Contrato: apis/payments_api_control_rentas.txt */
@@ -29,7 +30,8 @@ export type Payment = {
     phone: string;
   };
   unit: { id: string; name: string };
-  property: { id: string; name: string };
+  /** FE-22: el tipo decide cómo se escribe el lugar. */
+  property: { id: string; name: string; property_type: PropertyType };
   created_at: string;
   updated_at: string;
 };

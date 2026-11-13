@@ -1,4 +1,5 @@
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
+import { Icon } from '../Icon';
 import styled, { css } from 'styled-components';
 
 /** Acción terciaria de F-02 como enlace: "Ver detalle", "Ver contrato", "WhatsApp". */
@@ -34,3 +35,29 @@ export const BackLink = styled(Link)`
   padding: 0 10px 0 4px;
   gap: 2px;
 `;
+
+/** Estado que pone una lista en sus enlaces; Volver regresa a ella con búsqueda y posición. */
+export const FROM_LIST_STATE = { fromList: true } as const;
+
+/**
+ * Volver: si se llegó desde la lista, regresa en el historial (conserva búsqueda, filtros y
+ * posición); si se abrió el enlace directo, va a `to`.
+ */
+export function ReturnLink({ to, label }: { to: string; label: string }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fromList = (location.state as { fromList?: boolean } | null)?.fromList === true;
+  return (
+    <BackLink
+      to={to}
+      onClick={event => {
+        if (!fromList) return;
+        event.preventDefault();
+        void navigate(-1);
+      }}
+    >
+      <Icon name="chevronLeft" size={20} strokeWidth={2.4} />
+      {label}
+    </BackLink>
+  );
+}

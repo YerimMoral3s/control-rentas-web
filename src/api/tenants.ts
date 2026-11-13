@@ -50,11 +50,13 @@ export type Tenant = {
 
 type TenantListParams = {
   search?: string;
+  /** FE-13: orden por nombre y apellidos, aplicado antes de paginar. Sin sort: más recientes primero. */
+  sort?: 'name';
   page: number;
   page_size: number;
 };
 
-/** GET /v1/tenants — inquilinos activos; busca por alias, nombre, apellidos y teléfonos. */
+/** GET /v1/tenants — inquilinos activos; busca por alias, nombre, apellidos, teléfonos y unidad que renta. */
 export const getTenants = ({ search, ...params }: TenantListParams, signal?: AbortSignal) =>
   apiRequest<Tenant[], PaginatedMeta>({
     method: 'GET',

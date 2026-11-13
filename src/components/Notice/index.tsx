@@ -2,11 +2,13 @@ import type { ReactNode } from 'react';
 import styled, { type DefaultTheme } from 'styled-components';
 import { Icon, type IconName } from '../Icon';
 
-export type NoticeTone = 'success' | 'info' | 'uncertain' | 'error';
+/** warning: aviso fijo del estado de un registro (ámbar, sin interrumpir al lector de pantalla). */
+export type NoticeTone = 'success' | 'info' | 'warning' | 'uncertain' | 'error';
 
 const TONES: Record<NoticeTone, { icon: IconName; role: 'status' | 'alert' }> = {
   success: { icon: 'check', role: 'status' },
   info: { icon: 'info', role: 'status' },
+  warning: { icon: 'alert', role: 'status' },
   uncertain: { icon: 'alert', role: 'alert' },
   error: { icon: 'alert', role: 'alert' },
 };
@@ -15,6 +17,7 @@ const toneColors = (tone: NoticeTone, { color }: DefaultTheme) =>
   ({
     success: { fg: color.success, bg: color.successBg, border: color.successBorder },
     info: { fg: color.info, bg: color.infoBg, border: color.infoBorder },
+    warning: { fg: color.warning, bg: color.warningBg, border: color.warningBorder },
     uncertain: { fg: color.warning, bg: color.warningBg, border: color.warningBorder },
     error: { fg: color.danger, bg: color.dangerBg, border: color.dangerBorder },
   })[tone];

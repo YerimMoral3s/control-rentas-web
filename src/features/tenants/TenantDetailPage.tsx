@@ -1,12 +1,12 @@
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import styled from 'styled-components';
-import { BackLink, Button, Icon, SectionError, Skeleton, StateMessage } from '@components';
+import { Button, Icon, ReturnLink, SectionError, Skeleton, StateMessage } from '@components';
 import { useTenant } from '@hooks/querys/tenants';
 import { formatPhone } from '@lib/format';
 import { media, theme as tokens } from '@styles/theme';
 import { CurrentUnitsSection, HistorySection } from './components/ContractSections';
 import { OverdueSection } from './components/OverdueSection';
-import { fullName, propertyTypes, rentingLine } from './tenantText';
+import { fullName, rentingLine } from './tenantText';
 
 const Page = styled.div`
   width: 100%;
@@ -67,31 +67,12 @@ const Actions = styled.div`
   }
 `;
 
-type BackState = { listSearch?: string } | null;
-
 /** T-03 / T-04 / T-05: detalle de inquilino. Cada bloque carga y falla por separado. */
 export function TenantDetailPage() {
   const { tenantId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const backState = location.state as BackState;
   const query = useTenant(tenantId);
 
-  // Si se llegó desde la lista, Volver regresa a ella con su búsqueda y posición.
-  const back = (
-    <BackLink
-      to={`/inquilinos${backState?.listSearch ?? ''}`}
-      onClick={event => {
-        if (backState) {
-          event.preventDefault();
-          void navigate(-1);
-        }
-      }}
-    >
-      <Icon name="chevronLeft" size={20} strokeWidth={2.4} />
-      Inquilinos
-    </BackLink>
-  );
+  const back = <ReturnLink to="/inquilinos" label="Inquilinos" />;
 
   if (query.isPending) {
     return (
@@ -122,7 +103,6 @@ export function TenantDetailPage() {
 
   const tenant = query.data.data;
   const renting = tenant.current_contracts.length > 0;
-  const types = propertyTypes(tenant);
 
   return (
     <Page>
@@ -171,12 +151,8 @@ export function TenantDetailPage() {
         </Actions>
       </Header>
       <OverdueSection tenant={tenant} />
-      <CurrentUnitsSection
-        tenantId={tenant.id}
-        types={types}
-        count={tenant.current_contracts.length}
-      />
-      <HistorySection tenantId={tenant.id} types={types} />
+      <CurrentUnitsSection tenantId={tenant.id} count={tenant.current_contracts.length} />
+      <HistorySection tenantId={tenant.id} />
     </Page>
   );
 }

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link } from 'react-router';
 import styled from 'styled-components';
 import type { Tenant } from '@api/tenants';
-import { Button, Icon, StatusBadge } from '@components';
+import { Button, FROM_LIST_STATE, Icon, StatusBadge } from '@components';
 import { formatPhone } from '@lib/format';
 import { fullName, placeName } from '../tenantText';
 import { DebtLabel } from './DebtLabel';
@@ -150,7 +150,6 @@ type TenantQuickViewProps = {
 
 /** T-02: vista rápida en computadora. No bloquea la lista; Esc o la X la cierran. */
 export function TenantQuickView({ tenant, onClose }: TenantQuickViewProps) {
-  const location = useLocation();
   const closeRef = useRef(onClose);
 
   useEffect(() => {
@@ -212,7 +211,7 @@ export function TenantQuickView({ tenant, onClose }: TenantQuickViewProps) {
         <Button variant="neutral" disabled title="Disponible próximamente">
           Editar
         </Button>
-        <DetailLink to={`/inquilinos/${tenant.id}`} state={{ listSearch: location.search }}>
+        <DetailLink to={`/inquilinos/${tenant.id}`} state={FROM_LIST_STATE}>
           Ver detalle
         </DetailLink>
       </Foot>

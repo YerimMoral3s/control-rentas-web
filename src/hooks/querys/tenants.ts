@@ -13,7 +13,10 @@ export const useTenants = (search: string) =>
   useBaseInfiniteQuery(
     TenantsQueryKeys.list(search),
     (page, signal) =>
-      getTenants({ search: search || undefined, page, page_size: QueryPageSize.standard }, signal),
+      getTenants(
+        { search: search || undefined, sort: 'name', page, page_size: QueryPageSize.standard },
+        signal,
+      ),
     QueryStaleTime.operational,
   );
 

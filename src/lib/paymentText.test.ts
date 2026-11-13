@@ -18,7 +18,7 @@ const payment = (overrides: Partial<Payment> = {}): Payment => ({
   contract: { id: 'c1', status: 'active', contract_type: 'formal' },
   tenant: { id: 't1', first_name: 'María', last_name: 'López', alias: null, phone: '5512345678' },
   unit: { id: 'u1', name: 'Departamento 101' },
-  property: { id: 'pr1', name: 'Torre Centro' },
+  property: { id: 'pr1', name: 'Torre Centro', property_type: 'building' },
   created_at: '2026-10-01T00:00:00.000Z',
   updated_at: '2026-10-01T00:00:00.000Z',
   ...overrides,

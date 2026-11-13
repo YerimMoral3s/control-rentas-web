@@ -4,6 +4,9 @@ import { MorePage } from '@features/pending/MorePage';
 import { PendingScreen } from '@features/pending/PendingScreen';
 import { LoginPage } from '@features/access/LoginPage';
 import { HomePage } from '@features/home/HomePage';
+import { PropertiesPage } from '@features/properties/PropertiesPage';
+import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
+import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
 import { TenantsPage } from '@features/tenants/TenantsPage';
 import { ProtectedLayout } from './ProtectedLayout';
@@ -32,11 +35,12 @@ export const router = createBrowserRouter([
       { path: 'inquilinos', element: <TenantsPage /> },
       { path: 'inquilinos/:tenantId', element: <TenantDetailPage /> },
       { path: 'movimientos', element: <PendingScreen title="Movimientos" /> },
-      { path: 'propiedades', element: <PendingScreen title="Propiedades" /> },
+      { path: 'propiedades', element: <PropertiesPage /> },
+      { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
       { path: 'contratos', element: <PendingScreen title="Contratos" /> },
       { path: 'cobros/:paymentId', element: <PendingScreen title="Detalle del cobro" /> },
       { path: 'contratos/:contractId', element: <PendingScreen title="Detalle del contrato" /> },
-      { path: 'unidades/:unitId', element: <PendingScreen title="Detalle de la unidad" /> },
+      { path: 'unidades/:unitId', element: <UnitDetailPage /> },
       { path: 'mas', element: <MorePage /> },
       ...devRoutes,
       { path: '*', element: <PendingScreen title="No encontramos esta página" /> },

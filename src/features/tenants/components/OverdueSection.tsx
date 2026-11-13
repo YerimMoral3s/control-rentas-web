@@ -1,13 +1,12 @@
 import { Link } from 'react-router';
+import { DetailSection, ListFooter, MutedText, Panel, SectionError, Skeleton } from '@components';
 import styled from 'styled-components';
 import type { Tenant } from '@api/tenants';
-import { ListFooter, SectionError, Skeleton } from '@components';
 import { usePayments } from '@hooks/querys/payments';
 import { formatMoney } from '@lib/format';
 import { dueLabel, paymentConcept } from '@lib/paymentText';
 import { theme as tokens } from '@styles/theme';
-import { placeOf, propertyTypes } from '../tenantText';
-import { DetailSection, MutedText, Panel } from './DetailSection';
+import { placeOf } from '../tenantText';
 
 const Total = styled.div`
   padding: 14px 16px;
@@ -115,7 +114,6 @@ export function OverdueSection({ tenant }: { tenant: Tenant }) {
   const debt = tenant.overdue_debt;
   const hasDebt = Number(debt.amount) > 0;
   const payments = usePayments({ tenant_id: tenant.id, status: 'overdue' }, hasDebt);
-  const types = propertyTypes(tenant);
   const currentIds = new Set(tenant.current_contracts.map(contract => contract.id));
 
   if (!hasDebt) {
@@ -164,7 +162,7 @@ export function OverdueSection({ tenant }: { tenant: Tenant }) {
                 return (
                   <li key={payment.id}>
                     <Row to={`/cobros/${payment.id}`} $previous={previous}>
-                      <strong>{placeOf(payment, types)}</strong>
+                      <strong>{placeOf(payment)}</strong>
                       <Sub>
                         {paymentConcept(payment)} · {dueLabel(payment, debt.as_of_date)}
                       </Sub>

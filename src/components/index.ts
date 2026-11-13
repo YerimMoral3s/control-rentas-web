@@ -1,5 +1,6 @@
-export { ActionLink, actionLinkStyle, BackLink } from './ActionLink';
+export { ActionLink, actionLinkStyle, FROM_LIST_STATE, ReturnLink } from './ActionLink';
 export { Button } from './Button';
+export { DetailSection, MutedText, Panel } from './DetailSection';
 export { Dialog, DialogActions } from './Dialog';
 export { FilterChips } from './FilterChips';
 export { Icon, type IconName } from './Icon';

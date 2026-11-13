@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import type { Payment } from '@api/payments';
 import { ActionLink, StatusBadge } from '@components';
 import { formatMoney } from '@lib/format';
+import { placeParts } from '@lib/place';
 import { dueLabel, paymentConcept, tenantName } from '@lib/paymentText';
 import { PaymentWhatsApp, RegisterPaymentButton } from './PaymentActions';
 
@@ -41,7 +42,7 @@ const Concept = styled.span`
   color: ${({ theme }) => theme.color.neutral700};
 `;
 
-export const Place = styled.span`
+const Place = styled.span`
   font-size: 13px;
   line-height: 18px;
   color: ${({ theme }) => theme.color.neutral600};
@@ -82,6 +83,18 @@ const Secondary = styled.div`
   }
 `;
 
+/** Lugar del cobro: la parte principal en negritas (unidad en casa/bodega, propiedad en el resto). */
+export function PlaceText({ payment }: { payment: Payment }) {
+  const { primary, separator, secondary } = placeParts(payment.unit.name, payment.property);
+  return (
+    <>
+      <b>{primary}</b>
+      {separator}
+      {secondary}
+    </>
+  );
+}
+
 type PaymentCardProps = {
   payment: Payment;
   today: string | undefined;
@@ -97,7 +110,7 @@ export function PaymentCard({ payment, today }: PaymentCardProps) {
           <strong>{tenantName(payment.tenant)}</strong>
           <Concept>{paymentConcept(payment)}</Concept>
           <Place>
-            <b>{payment.property.name}</b> / {payment.unit.name}
+            <PlaceText payment={payment} />
           </Place>
         </Who>
         <Amount>{formatMoney(payment.amount)}</Amount>

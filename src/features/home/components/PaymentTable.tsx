@@ -4,7 +4,7 @@ import { ActionLink, StatusBadge } from '@components';
 import { formatMoney } from '@lib/format';
 import { dueLabel, paymentConcept, tenantName } from '@lib/paymentText';
 import { PaymentWhatsApp, RegisterPaymentButton } from './PaymentActions';
-import { DueText } from './PaymentCard';
+import { DueText, PlaceText } from './PaymentCard';
 
 const COLUMNS = 'minmax(0, 1.2fr) minmax(0, 1fr) 150px 100px auto';
 
@@ -117,7 +117,7 @@ export function PaymentRow({ payment, today }: PaymentRowProps) {
         <span>{paymentConcept(payment)}</span>
       </Who>
       <Place role="cell">
-        <b>{payment.property.name}</b> / {payment.unit.name}
+        <PlaceText payment={payment} />
       </Place>
       <Due role="cell">
         <StatusBadge status={payment.status} compact />

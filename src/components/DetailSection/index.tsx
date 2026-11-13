@@ -7,6 +7,13 @@ const Section = styled.section`
   gap: 12px;
 `;
 
+const Head = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
 const Title = styled.h2`
   margin: 0;
   display: flex;
@@ -23,22 +30,25 @@ const Count = styled.span`
   color: ${({ theme }) => theme.color.neutral600};
 `;
 
-/** Bloque titulado del detalle ("Pagos atrasados", "Unidades que renta", "Historial"). */
-export function DetailSection({
-  title,
-  count,
-  children,
-}: {
+/** Bloque titulado de un detalle ("Pagos atrasados", "Unidades", "Historial", "Gastos"). */
+type DetailSectionProps = {
   title: string;
   count?: number;
+  /** Acción contextual a la derecha del título (por ejemplo, "Registrar gasto"). */
+  action?: ReactNode;
   children: ReactNode;
-}) {
+};
+
+export function DetailSection({ title, count, action, children }: DetailSectionProps) {
   return (
     <Section aria-label={title}>
-      <Title>
-        {title}
-        {count !== undefined ? <Count>· {count}</Count> : null}
-      </Title>
+      <Head>
+        <Title>
+          {title}
+          {count !== undefined ? <Count>· {count}</Count> : null}
+        </Title>
+        {action}
+      </Head>
       {children}
     </Section>
   );

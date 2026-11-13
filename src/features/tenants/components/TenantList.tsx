@@ -1,7 +1,7 @@
-import { Link, useLocation } from 'react-router';
+import { Link } from 'react-router';
 import styled, { css } from 'styled-components';
 import type { Tenant } from '@api/tenants';
-import { Icon } from '@components';
+import { FROM_LIST_STATE, Icon } from '@components';
 import { formatPhone } from '@lib/format';
 import { fullName, occupationSummary } from '../tenantText';
 import { DebtLabel } from './DebtLabel';
@@ -140,10 +140,7 @@ export function TenantTableHeader() {
 }
 
 /** Enlace al detalle que recuerda la búsqueda para volver a la misma lista. */
-const useDetailLink = (tenant: Tenant) => {
-  const location = useLocation();
-  return { to: `/inquilinos/${tenant.id}`, state: { listSearch: location.search } };
-};
+const detailLink = (tenant: Tenant) => ({ to: `/inquilinos/${tenant.id}`, state: FROM_LIST_STATE });
 
 function RowContent({ tenant }: { tenant: Tenant }) {
   const occupation = occupationSummary(tenant);
@@ -169,7 +166,7 @@ function RowContent({ tenant }: { tenant: Tenant }) {
 
 /** T-01 en celular: la tarjeta abre el detalle a pantalla completa. */
 export function TenantCard({ tenant }: { tenant: Tenant }) {
-  const link = useDetailLink(tenant);
+  const link = detailLink(tenant);
   const occupation = occupationSummary(tenant);
   return (
     <li>
@@ -193,7 +190,7 @@ export function TenantCard({ tenant }: { tenant: Tenant }) {
 
 /** T-01 en tableta: la fila abre el detalle. */
 export function TenantLinkRow({ tenant }: { tenant: Tenant }) {
-  const link = useDetailLink(tenant);
+  const link = detailLink(tenant);
   return (
     <RowLink {...link}>
       <RowContent tenant={tenant} />

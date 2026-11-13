@@ -1,4 +1,5 @@
 import { apiRequest } from './http';
+import type { PropertyType } from './properties';
 import type { PaginatedMeta } from './types';
 
 /** Contrato: apis/contracts_api_control_rentas.txt */
@@ -23,7 +24,8 @@ export type ContractSummary = {
     phone: string;
   };
   unit: { id: string; name: string };
-  property: { id: string; name: string };
+  /** FE-22: el tipo decide cómo se escribe el lugar. */
+  property: { id: string; name: string; property_type: PropertyType };
 };
 
 /** Modelo Contract completo (campos de consulta; el depósito se agrega con Contratos). */
@@ -56,14 +58,23 @@ export const getContracts = (params: ContractListParams, signal?: AbortSignal) =
   });
 
 /** GET /v1/contracts con scope=dashboard: contratos activos actuales que terminan en los próximos días. */
-export const getExpiringContracts = (days: number, pageSize: number, signal?: AbortSignal) =>
+export const getExpiringContracts = (
+  days: number,
+  page: number,
+  pageSize: number,
+  signal?: AbortSignal,
+) =>
   apiRequest<ContractSummary[], PaginatedMeta>({
     method: 'GET',
     url: '/contracts',
     params: {
       scope: 'dashboard',
       status: 'active',
+      is_current: true,
       expiring_within_days: days,
+      /** FE-21: el que vence primero va arriba, en todo el resultado. */
+      sort: 'end_date',
+      page,
       page_size: pageSize,
     },
     signal,

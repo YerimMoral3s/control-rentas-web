@@ -102,8 +102,8 @@ export function TenantsPage() {
         <SearchField
           value={search}
           onChange={setSearch}
-          label="Buscar inquilino por nombre o teléfono"
-          placeholder="Buscar por nombre o teléfono"
+          label="Buscar inquilino por nombre, teléfono o unidad"
+          placeholder="Buscar por nombre, teléfono o unidad"
         />
       </Search>
     </>
@@ -130,7 +130,7 @@ export function TenantsPage() {
       <StateMessage
         kind="empty"
         title={`No encontramos “${debouncedSearch}”`}
-        description="Prueba con otro nombre o teléfono."
+        description="Prueba con otro nombre, teléfono o unidad."
         action={
           <Button variant="secondary" onClick={() => setSearch('')}>
             Limpiar búsqueda
