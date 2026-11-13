@@ -6,6 +6,7 @@ import { usePayments } from '@hooks/querys/payments';
 import { formatMoney } from '@lib/format';
 import { dueLabel, paymentConcept } from '@lib/paymentText';
 import { theme as tokens } from '@styles/theme';
+import { placeOf, propertyTypes } from '../tenantText';
 import { DetailSection, MutedText, Panel } from './DetailSection';
 
 const Total = styled.div`
@@ -114,6 +115,7 @@ export function OverdueSection({ tenant }: { tenant: Tenant }) {
   const debt = tenant.overdue_debt;
   const hasDebt = Number(debt.amount) > 0;
   const payments = usePayments({ tenant_id: tenant.id, status: 'overdue' }, hasDebt);
+  const types = propertyTypes(tenant);
   const currentIds = new Set(tenant.current_contracts.map(contract => contract.id));
 
   if (!hasDebt) {
@@ -162,9 +164,7 @@ export function OverdueSection({ tenant }: { tenant: Tenant }) {
                 return (
                   <li key={payment.id}>
                     <Row to={`/cobros/${payment.id}`} $previous={previous}>
-                      <strong>
-                        {payment.property.name} / {payment.unit.name}
-                      </strong>
+                      <strong>{placeOf(payment, types)}</strong>
                       <Sub>
                         {paymentConcept(payment)} · {dueLabel(payment, debt.as_of_date)}
                       </Sub>

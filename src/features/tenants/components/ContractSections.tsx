@@ -1,11 +1,11 @@
 import styled from 'styled-components';
-import type { Contract } from '@api/contracts';
 import { ActionLink, ListFooter, SectionError, Skeleton, StatusBadge } from '@components';
 import { useContracts } from '@hooks/querys/contracts';
 import { formatDateRange } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { theme as tokens } from '@styles/theme';
-import { contractTypeLabel } from '../tenantText';
+import type { PropertyType } from '@api/properties';
+import { contractTypeLabel, placeOf } from '../tenantText';
 import { DetailSection, MutedText, Panel } from './DetailSection';
 
 const List = styled.ul`
@@ -75,8 +75,6 @@ const HistoryRow = styled.li`
   }
 `;
 
-const place = (contract: Contract) => `${contract.property.name} / ${contract.unit.name}`;
-
 function Loading() {
   return (
     <List aria-busy="true">
@@ -86,7 +84,13 @@ function Loading() {
 }
 
 /** Unidades que renta (T-03 / T-04): cada ocupación actual con su contrato, estado y renta. */
-export function CurrentUnitsSection({ tenantId, count }: { tenantId: string; count: number }) {
+type SectionProps = {
+  tenantId: string;
+  /** Tipos de propiedad conocidos del inquilino (FE-14). */
+  types: Map<string, PropertyType>;
+};
+
+export function CurrentUnitsSection({ tenantId, types, count }: SectionProps & { count: number }) {
   const query = useContracts({ tenant_id: tenantId, is_current: true }, count > 0);
   if (count === 0) return null;
 
@@ -101,7 +105,7 @@ export function CurrentUnitsSection({ tenantId, count }: { tenantId: string; cou
           {query.items.map(contract => (
             <Card as="li" key={contract.id}>
               <Top>
-                <strong>{place(contract)}</strong>
+                <strong>{placeOf(contract, types)}</strong>
                 <StatusBadge status={contract.status} compact />
               </Top>
               <Line>
@@ -128,7 +132,7 @@ export function CurrentUnitsSection({ tenantId, count }: { tenantId: string; cou
 }
 
 /** Historial (T-03 / T-05): contratos que ya no son ocupación actual. */
-export function HistorySection({ tenantId }: { tenantId: string }) {
+export function HistorySection({ tenantId, types }: SectionProps) {
   const query = useContracts({ tenant_id: tenantId, is_current: false });
 
   return (
@@ -144,7 +148,7 @@ export function HistorySection({ tenantId }: { tenantId: string }) {
           <List>
             {query.items.map(contract => (
               <HistoryRow key={contract.id}>
-                <strong>{place(contract)}</strong>
+                <strong>{placeOf(contract, types)}</strong>
                 <Line>
                   {contractTypeLabel(contract.contract_type)} ·{' '}
                   {formatDateRange(contract.start_date, contract.end_date)}

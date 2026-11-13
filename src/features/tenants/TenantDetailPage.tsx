@@ -6,7 +6,7 @@ import { formatPhone } from '@lib/format';
 import { media, theme as tokens } from '@styles/theme';
 import { CurrentUnitsSection, HistorySection } from './components/ContractSections';
 import { OverdueSection } from './components/OverdueSection';
-import { fullName, rentingLine } from './tenantText';
+import { fullName, propertyTypes, rentingLine } from './tenantText';
 
 const Page = styled.div`
   width: 100%;
@@ -122,6 +122,7 @@ export function TenantDetailPage() {
 
   const tenant = query.data.data;
   const renting = tenant.current_contracts.length > 0;
+  const types = propertyTypes(tenant);
 
   return (
     <Page>
@@ -170,8 +171,12 @@ export function TenantDetailPage() {
         </Actions>
       </Header>
       <OverdueSection tenant={tenant} />
-      <CurrentUnitsSection tenantId={tenant.id} count={tenant.current_contracts.length} />
-      <HistorySection tenantId={tenant.id} />
+      <CurrentUnitsSection
+        tenantId={tenant.id}
+        types={types}
+        count={tenant.current_contracts.length}
+      />
+      <HistorySection tenantId={tenant.id} types={types} />
     </Page>
   );
 }

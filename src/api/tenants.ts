@@ -1,12 +1,18 @@
 import type { ContractStatus } from './contracts';
 import { apiRequest } from './http';
+import type { PropertyType } from './properties';
 import type { PaginatedMeta } from './types';
 
 /** Contrato: apis/tenants_api_control_rentas.txt */
 
 export type TenantStatus = 'active' | 'inactive';
 
-type UnitRef = { id: string; name: string; property: { id: string; name: string } };
+/** FE-14: la propiedad trae su tipo para escribir el lugar como pide T-01. */
+type UnitRef = {
+  id: string;
+  name: string;
+  property: { id: string; name: string; property_type: PropertyType };
+};
 
 export type OverdueDebt = {
   as_of_date: string;
