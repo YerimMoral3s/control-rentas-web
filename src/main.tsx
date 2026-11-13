@@ -6,10 +6,6 @@ import { installSessionHandlers } from '@session/session';
 
 installSessionHandlers();
 
-if (import.meta.env.DEV) {
-  void import('@session/devTools').then(({ installDevTools }) => installDevTools());
-}
-
 const container = document.getElementById('root');
 if (!container) throw new Error('No se encontró el contenedor #root');
 
