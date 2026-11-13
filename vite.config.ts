@@ -15,6 +15,7 @@ export default defineConfig({
       '@features': fromRoot('./src/features'),
       '@hooks': fromRoot('./src/hooks'),
       '@lib': fromRoot('./src/lib'),
+      '@session': fromRoot('./src/session'),
       '@stores': fromRoot('./src/stores'),
       '@styles': fromRoot('./src/styles'),
     },

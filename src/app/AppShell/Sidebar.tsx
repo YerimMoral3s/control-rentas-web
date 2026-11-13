@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { Icon, Logo } from '@components';
+import { LogoutDialog } from '@features/access/LogoutDialog';
 import { DESTINATIONS, isActivePath } from '../navigation';
 import { media } from '@styles/theme';
 
@@ -92,6 +93,26 @@ const MoreButton = styled.button<{ $active: boolean }>`
   }
 `;
 
+const Footer = styled.div`
+  flex: none;
+  padding-top: 4px;
+  border-top: 1px solid ${({ theme }) => theme.color.neutral200};
+`;
+
+const LogoutButton = styled.button`
+  ${itemStyles}
+  width: 100%;
+  color: ${({ theme }) => theme.color.neutral700};
+
+  &:hover {
+    background: ${({ theme }) => theme.color.neutral100};
+  }
+
+  &:focus-visible {
+    outline-offset: -3px;
+  }
+`;
+
 const MoreWrapper = styled.div`
   position: relative;
   flex: none;
@@ -121,6 +142,7 @@ export function Sidebar() {
   const itemsRef = useRef<HTMLDivElement>(null);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const [visibleCount, setVisibleCount] = useState(DESTINATIONS.length);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   // El menú queda ligado a la ruta en que se abrió: al navegar se cierra solo.
   const [menuOpenAt, setMenuOpenAt] = useState<string | null>(null);
   const menuOpen = menuOpenAt === pathname;
@@ -192,6 +214,14 @@ export function Sidebar() {
           </MoreWrapper>
         ) : null}
       </Items>
+      {/* Cerrar sesión queda siempre separado de los destinos, al pie de la barra (F-10). */}
+      <Footer>
+        <LogoutButton type="button" onClick={() => setLogoutOpen(true)}>
+          <Icon name="logout" size={20} />
+          Cerrar sesión
+        </LogoutButton>
+      </Footer>
+      <LogoutDialog open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </Aside>
   );
 }

@@ -2,7 +2,8 @@ import { createBrowserRouter, type RouteObject } from 'react-router';
 import { AppErrorScreen } from '@features/pending/AppErrorScreen';
 import { MorePage } from '@features/pending/MorePage';
 import { PendingScreen } from '@features/pending/PendingScreen';
-import { AppShell } from './AppShell';
+import { LoginPage } from '@features/access/LoginPage';
+import { ProtectedLayout } from './ProtectedLayout';
 
 const devRoutes: RouteObject[] = import.meta.env.DEV
   ? [
@@ -17,8 +18,9 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
   : [];
 
 export const router = createBrowserRouter([
+  { path: 'acceso', element: <LoginPage />, errorElement: <AppErrorScreen /> },
   {
-    element: <AppShell />,
+    element: <ProtectedLayout />,
     errorElement: <AppErrorScreen />,
     // La galería de desarrollo se carga en diferido; mientras tanto no se muestra nada extra.
     HydrateFallback: () => null,

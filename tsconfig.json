@@ -25,6 +25,7 @@
       "@features/*": ["./src/features/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@lib/*": ["./src/lib/*"],
+      "@session/*": ["./src/session/*"],
       "@stores": ["./src/stores"],
       "@styles/*": ["./src/styles/*"]
     }
