@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Button, Dialog, PasswordField, TextField } from '@components';
 import { useLogin } from '@hooks/querys/auth';
-import { startSession } from '@session/session';
+import { clearSessionData, startSession } from '@session/session';
+import { broadcastSession } from '@session/sessionChannel';
 import { useAuth } from '@stores';
 import { describeLoginError, PASSWORD_RULES } from './loginErrors';
 
@@ -43,6 +45,7 @@ export function ReauthDialog({ onReturned }: ReauthDialogProps) {
     formState: { errors },
   } = useForm<ReauthValues>({ defaultValues: { password: '' } });
   const loginMutation = useLogin();
+  const navigate = useNavigate();
 
   if (status !== 'expired' || !account) return null;
 
@@ -65,6 +68,14 @@ export function ReauthDialog({ onReturned }: ReauthDialogProps) {
     );
   });
 
+  // Salida segura alternativa: la sesión ya no es válida en el servidor, así que solo se retira
+  // el contexto local (también en otras pestañas de esta cuenta) y se abre el acceso vacío.
+  const signOut = () => {
+    clearSessionData();
+    broadcastSession({ type: 'logout', accountId: account.id });
+    navigate('/acceso', { replace: true });
+  };
+
   return (
     <Dialog open centered dismissible={false} title="Tu sesión terminó" onClose={() => undefined}>
       <Text>
@@ -81,6 +92,9 @@ export function ReauthDialog({ onReturned }: ReauthDialogProps) {
         />
         <Button type="submit" fullWidth loading={loginMutation.isPending} loadingLabel="Entrando…">
           Volver a entrar
+        </Button>
+        <Button variant="neutral" fullWidth disabled={loginMutation.isPending} onClick={signOut}>
+          Cerrar sesión
         </Button>
       </Form>
     </Dialog>

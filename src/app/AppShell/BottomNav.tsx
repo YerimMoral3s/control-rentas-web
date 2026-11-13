@@ -9,9 +9,11 @@ const Nav = styled.nav`
   inset: auto 0 0;
   z-index: 20;
   height: calc(${({ theme }) => theme.size.bottomNav} + env(safe-area-inset-bottom));
-  padding: 0 4px calc(4px + env(safe-area-inset-bottom));
+  /* En pantallas anchas (sin llegar a computadora) los destinos no se estiran de más. */
+  padding: 0 max(4px, calc((100% - 560px) / 2)) calc(4px + env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: 2px;
   background: ${({ theme }) => theme.color.white};
   border-top: 1px solid ${({ theme }) => theme.color.neutral200};
 
@@ -31,6 +33,13 @@ const Item = styled(NavLink)`
   color: ${({ theme }) => theme.color.neutral600};
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
+
+  /* Celulares de menos de 390 px (iPhone SE, Android de 360 px): las etiquetas no se juntan. */
+  @media (max-width: 389px) {
+    font-size: 11px;
+    letter-spacing: -0.1px;
+  }
 
   &:hover {
     color: ${({ theme }) => theme.color.neutral600};

@@ -13,7 +13,8 @@ const backdropIn = keyframes`from { opacity: 0; } to { opacity: 1; }`;
 const StyledDialog = styled.dialog<{ $centered: boolean }>`
   margin: auto auto 0;
   width: 100%;
-  max-width: 100%;
+  /* Hoja móvil: en pantallas anchas se centra en lugar de ocupar todo el ancho. */
+  max-width: 560px;
   padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
   border: 0;
   border-radius: ${({ theme }) => theme.radius.panel} ${({ theme }) => theme.radius.panel} 0 0;
@@ -31,6 +32,7 @@ const StyledDialog = styled.dialog<{ $centered: boolean }>`
     css`
       margin: auto;
       width: calc(100% - 32px);
+      max-width: ${theme.size.dialog};
       border-radius: ${theme.radius.panel};
       padding: 24px 16px;
 

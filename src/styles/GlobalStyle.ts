@@ -3,7 +3,11 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
 
-  html { -webkit-text-size-adjust: 100%; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Sin el destello azul que el navegador móvil pone al tocar botones, enlaces y campos. */
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     margin: 0;
