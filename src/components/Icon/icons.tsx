@@ -32,6 +32,8 @@ export const ICONS = {
   close: <path d="M6 6l12 12M18 6 6 18" />,
   chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronLeft: <path d="M15 6l-6 6 6 6" />,
+  chevronRight: <path d="m9 6 6 6-6 6" />,
+  plus: <path d="M12 5v14M5 12h14" />,
   calendar: (
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -90,7 +92,10 @@ export const ICONS = {
       <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
     </>
   ),
-  wrench: <path d="M14.5 6.5a4 4 0 0 0 4.9 4.9L11 19.8a2 2 0 0 1-2.8-2.8z" />,
+  // El trazo del diseño (M14.5 6.5…) se veía como una cuña; se usa una llave inglesa completa.
+  wrench: (
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+  ),
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof ICONS | 'more';

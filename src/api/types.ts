@@ -14,6 +14,8 @@ export type ApiMeta = {
   pagination?: Pagination;
 };
 
+export type PaginatedMeta = ApiMeta & { pagination: Pagination };
+
 export type ApiSuccess<TData, TMeta extends ApiMeta = ApiMeta> = {
   data: TData;
   meta: TMeta;

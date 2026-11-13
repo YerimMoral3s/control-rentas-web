@@ -82,6 +82,8 @@ export const theme = {
      * El diseño define 390 y 1440 px; desde 768 px ya caben barra lateral y contenido (acuerdo del 12 nov.).
      */
     desktop: '768px',
+    /** Composiciones anchas: tabla de cobros, resumen en una fila y vista rápida junto a la lista. */
+    wide: '1200px',
   },
   focusRing: '3px solid #2452C8',
 } as const;
@@ -90,5 +92,6 @@ export type AppTheme = typeof theme;
 
 export const media = {
   desktop: `@media (min-width: ${theme.breakpoint.desktop})`,
+  wide: `@media (min-width: ${theme.breakpoint.wide})`,
   reducedMotion: '@media (prefers-reduced-motion: reduce)',
 } as const;

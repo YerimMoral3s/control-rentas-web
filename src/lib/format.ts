@@ -14,3 +14,10 @@ export const formatMoney = (amount: string | number): string => {
   if (!Number.isFinite(value)) return '—';
   return moneyFormatter.format(value);
 };
+
+/** "5512345678" → "55 1234 5678". Otros largos se muestran tal como llegan. */
+export const formatPhone = (phone: string): string => {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length !== 10) return phone;
+  return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+};

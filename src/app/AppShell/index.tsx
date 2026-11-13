@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Outlet } from 'react-router';
+import { Outlet, ScrollRestoration } from 'react-router';
 import styled from 'styled-components';
 import { Notice } from '@components';
 import { media } from '@styles/theme';
@@ -72,6 +72,8 @@ export function AppShell({ blocked, returned, onDismissReturned }: AppShellProps
         </Content>
       </Main>
       <BottomNav />
+      {/* Volver a una lista restaura su posición; una pantalla nueva abre arriba. */}
+      <ScrollRestoration />
     </Layout>
   );
 }

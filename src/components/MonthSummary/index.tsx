@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import styled from 'styled-components';
 import { formatMoney } from '@lib/format';
-import { theme as tokens } from '@styles/theme';
+import { media, theme as tokens } from '@styles/theme';
 import { Icon } from '../Icon';
 
 const overdueStripe = `repeating-linear-gradient(135deg, ${tokens.color.danger} 0 3px, ${tokens.color.dangerStripe} 3px 5px)`;
@@ -66,6 +66,43 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  /* Computadora ancha: una fila (Renta esperada | barra | Balance) y el desglose debajo. */
+  ${media.wide} {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 260px;
+    grid-template-areas:
+      'expected bar balance'
+      'breakdown breakdown breakdown';
+    column-gap: 24px;
+    row-gap: 0;
+    align-items: center;
+    padding: 4px 20px 20px;
+  }
+`;
+
+const Expected = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+
+  ${media.wide} {
+    grid-area: expected;
+    flex-direction: column;
+    gap: 2px;
+  }
+`;
+
+const BarBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  ${media.wide} {
+    grid-area: bar;
+    gap: 8px;
+  }
 `;
 
 const Row = styled.div`
@@ -141,6 +178,10 @@ const Collapsible = styled.div<{ $open: boolean }>`
     overflow: hidden;
     min-height: 0;
   }
+
+  ${media.wide} {
+    grid-area: breakdown;
+  }
 `;
 
 const Breakdown = styled.div`
@@ -148,12 +189,44 @@ const Breakdown = styled.div`
   flex-direction: column;
   gap: 10px;
   padding-top: 4px;
+
+  ${media.wide} {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid ${({ theme }) => theme.color.neutral200};
+
+    > ${Row} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 0 16px;
+      border-left: 1px solid ${({ theme }) => theme.color.neutral200};
+    }
+
+    > ${Row}:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    ${Amount} {
+      font-size: 20px;
+      line-height: 26px;
+    }
+  }
 `;
 
 const ExpensesRow = styled(Row)`
   align-items: center;
   border-top: 1px solid ${({ theme }) => theme.color.neutral200};
   padding-top: 10px;
+
+  ${media.wide} {
+    border-top: 0;
+    padding-top: 0;
+  }
 `;
 
 const Balance = styled.div`
@@ -164,6 +237,10 @@ const Balance = styled.div`
   border-radius: ${({ theme }) => theme.radius.control};
   background: ${({ theme }) => theme.color.primary50};
   color: ${({ theme }) => theme.color.primary700};
+
+  ${media.wide} {
+    grid-area: balance;
+  }
 `;
 
 const BalanceText = styled.span`
@@ -235,32 +312,34 @@ export function MonthSummary({
         </Cue>
       </Header>
       <Content>
-        <Row>
+        <Expected>
           <RowLabel>Renta esperada</RowLabel>
           <BigAmount>{formatMoney(expected)}</BigAmount>
-        </Row>
-        <Bar
-          role="img"
-          aria-label={`Pagado ${formatMoney(paid)}, Pendiente ${formatMoney(pending)}, Vencido ${formatMoney(overdue)}`}
-        >
-          <span style={{ flex: toNumber(paid), background: tokens.color.success }} />
-          <span style={{ flex: toNumber(pending), background: tokens.color.warningBar }} />
-          <span style={{ flex: toNumber(overdue), background: overdueStripe }} />
-        </Bar>
-        <Legend aria-hidden="true">
-          <span>
-            <Swatch $bg={tokens.color.success} />
-            Pagado
-          </span>
-          <span>
-            <Swatch $bg={tokens.color.warningBar} />
-            Pendiente
-          </span>
-          <span>
-            <Swatch $bg={overdueStripe} />
-            Vencido
-          </span>
-        </Legend>
+        </Expected>
+        <BarBlock>
+          <Bar
+            role="img"
+            aria-label={`Pagado ${formatMoney(paid)}, Pendiente ${formatMoney(pending)}, Vencido ${formatMoney(overdue)}`}
+          >
+            <span style={{ flex: toNumber(paid), background: tokens.color.success }} />
+            <span style={{ flex: toNumber(pending), background: tokens.color.warningBar }} />
+            <span style={{ flex: toNumber(overdue), background: overdueStripe }} />
+          </Bar>
+          <Legend aria-hidden="true">
+            <span>
+              <Swatch $bg={tokens.color.success} />
+              Pagado
+            </span>
+            <span>
+              <Swatch $bg={tokens.color.warningBar} />
+              Pendiente
+            </span>
+            <span>
+              <Swatch $bg={overdueStripe} />
+              Vencido
+            </span>
+          </Legend>
+        </BarBlock>
         <Collapsible id={contentId} $open={open} aria-hidden={!open} inert={!open}>
           <div>
             <Breakdown>
