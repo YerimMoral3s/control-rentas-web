@@ -47,3 +47,27 @@ export const formatDateRange = (start: string, end: string) =>
   start.slice(0, 4) === end.slice(0, 4)
     ? `${formatShortDate(start)} – ${formatDateWithYear(end)}`
     : `${formatDateWithYear(start)} – ${formatDateWithYear(end)}`;
+
+/** Instantes de la API (UTC) se muestran en la hora operativa de México, no la del dispositivo. */
+const OPERATIVE_TIME_ZONE = 'America/Mexico_City';
+
+const instantDateFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: OPERATIVE_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+const instantTimeFormatter = new Intl.DateTimeFormat('es-MX', {
+  timeZone: OPERATIVE_TIME_ZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+
+/** "2026-10-22T18:00:00Z" → fecha civil en México "2026-10-22". */
+export const civilDateOf = (instant: string) => instantDateFormatter.format(new Date(instant));
+
+/** "4 sep. 2026 a las 10:42" (hora de México). */
+export const formatDateTime = (instant: string) =>
+  `${formatDateWithYear(civilDateOf(instant))} a las ${instantTimeFormatter.format(new Date(instant))}`;

@@ -1,5 +1,10 @@
-import { getContracts, getExpiringContracts, type ContractListParams } from '@api/contracts';
-import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery } from './queryBase';
+import {
+  getContract,
+  getContracts,
+  getExpiringContracts,
+  type ContractListParams,
+} from '@api/contracts';
+import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
 
 type ContractFilters = Omit<ContractListParams, 'page' | 'page_size'>;
 
@@ -10,6 +15,7 @@ export const ContractsQueryKeys = {
   root: ['contracts'] as const,
   expiring: ['contracts', 'expiring', EXPIRING_DAYS] as const,
   list: (filters: ContractFilters) => ['contracts', 'list', filters] as const,
+  detail: (contractId: string) => ['contracts', 'detail', contractId] as const,
 };
 
 /** Contratos con filtros (por ejemplo, ocupaciones actuales o historial de un inquilino). */
@@ -32,4 +38,13 @@ export const useExpiringContracts = (enabled: boolean) =>
     (page, signal) => getExpiringContracts(EXPIRING_DAYS, page, QueryPageSize.standard, signal),
     QueryStaleTime.operational,
     enabled,
+  );
+
+/** C-03 a C-06: un contrato con su depósito. */
+export const useContract = (contractId: string | undefined) =>
+  useBaseQuery(
+    ContractsQueryKeys.detail(contractId ?? ''),
+    signal => getContract(contractId ?? '', signal),
+    QueryStaleTime.operational,
+    { enabled: Boolean(contractId) },
   );

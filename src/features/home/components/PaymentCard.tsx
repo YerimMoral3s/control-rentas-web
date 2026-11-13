@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import type { Payment } from '@api/payments';
-import { ActionLink, StatusBadge } from '@components';
+import { ActionLink, FROM_LIST_STATE, StatusBadge } from '@components';
 import { formatMoney } from '@lib/format';
 import { placeParts } from '@lib/place';
 import { dueLabel, paymentConcept, tenantName } from '@lib/paymentText';
@@ -122,7 +122,9 @@ export function PaymentCard({ payment, today }: PaymentCardProps) {
       <RegisterPaymentButton payment={payment} fullWidth />
       <Secondary>
         <PaymentWhatsApp payment={payment} today={today} />
-        <ActionLink to={`/cobros/${payment.id}`}>Ver detalle</ActionLink>
+        <ActionLink to={`/cobros/${payment.id}`} state={FROM_LIST_STATE}>
+          Ver detalle
+        </ActionLink>
       </Secondary>
     </Card>
   );

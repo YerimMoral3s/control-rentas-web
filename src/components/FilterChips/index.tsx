@@ -68,7 +68,8 @@ const Count = styled.span<{ $active: boolean; $disabled: boolean }>`
 export type FilterChipOption<T extends string> = {
   value: T;
   label: string;
-  count: number;
+  /** Conteo completo del servidor. Sin conteo, el chip se muestra sin número y siempre se puede elegir. */
+  count?: number;
 };
 
 type FilterChipsProps<T extends string> = {
@@ -93,6 +94,7 @@ export function FilterChips<T extends string>({
       {options.map(option => {
         const active = option.value === value;
         const disabled = option.count === 0 && !active;
+        const hasCount = option.count !== undefined;
         return (
           <Chip
             key={option.value}
@@ -101,15 +103,17 @@ export function FilterChips<T extends string>({
             $active={active}
             aria-selected={active}
             aria-disabled={disabled || undefined}
-            aria-label={`${option.label}, ${option.count}${disabled ? ', no disponible' : ''}`}
+            aria-label={`${option.label}${hasCount ? `, ${option.count}` : ''}${disabled ? ', no disponible' : ''}`}
             onClick={() => {
               if (!disabled && !active) onChange(option.value);
             }}
           >
             {option.label}
-            <Count aria-hidden="true" $active={active} $disabled={disabled}>
-              {option.count}
-            </Count>
+            {hasCount ? (
+              <Count aria-hidden="true" $active={active} $disabled={disabled}>
+                {option.count}
+              </Count>
+            ) : null}
           </Chip>
         );
       })}

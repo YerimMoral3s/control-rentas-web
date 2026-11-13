@@ -66,6 +66,7 @@ export const getAttentionPayments = (
 
 export type PaymentListParams = {
   status?: PaymentStatus | 'all' | 'unpaid';
+  /** Incluye rentas válidas de contratos anteriores que cubren meses de su vigencia. */
   tenant_id?: string;
   contract_id?: string;
   unit_id?: string;
@@ -81,4 +82,38 @@ export const getPayments = (params: PaymentListParams, signal?: AbortSignal) =>
     params,
     signal,
     operation: 'payments_list',
+  });
+
+/** Detalle de un cobro: el contrato de origen trae sus fechas. */
+export type PaymentDetail = Omit<Payment, 'contract'> & {
+  contract: Payment['contract'] & { start_date: string; end_date: string };
+};
+
+/** GET /v1/payments/:id */
+export const getPayment = (paymentId: string, signal?: AbortSignal) =>
+  apiRequest<PaymentDetail>({
+    method: 'GET',
+    url: `/payments/${encodeURIComponent(paymentId)}`,
+    signal,
+    operation: 'payment_detail',
+  });
+
+/** Resumen de cobros de un contrato: conteos, adeudo y próximo pago sobre el conjunto completo. */
+export type ContractPaymentsSummary = {
+  contract: { id: string };
+  as_of_date: string;
+  counts: { all: number; unpaid: number; paid: number; cancelled: number };
+  overdue_debt: { amount: string; payment_count: number };
+  /** Primer impago que vence hoy o después; null no significa que no haya atrasos. */
+  next_payment: Payment | null;
+};
+
+/** GET /v1/payments/contract-summary?contract_id= */
+export const getContractPaymentsSummary = (contractId: string, signal?: AbortSignal) =>
+  apiRequest<ContractPaymentsSummary>({
+    method: 'GET',
+    url: '/payments/contract-summary',
+    params: { contract_id: contractId },
+    signal,
+    operation: 'contract_payments_summary',
   });

@@ -1,5 +1,13 @@
 import { Link } from 'react-router';
-import { DetailSection, ListFooter, MutedText, Panel, SectionError, Skeleton } from '@components';
+import {
+  DetailSection,
+  FROM_LIST_STATE,
+  ListFooter,
+  MutedText,
+  Panel,
+  SectionError,
+  Skeleton,
+} from '@components';
 import styled from 'styled-components';
 import type { Tenant } from '@api/tenants';
 import { usePayments } from '@hooks/querys/payments';
@@ -161,7 +169,7 @@ export function OverdueSection({ tenant }: { tenant: Tenant }) {
                 const previous = !currentIds.has(payment.contract.id);
                 return (
                   <li key={payment.id}>
-                    <Row to={`/cobros/${payment.id}`} $previous={previous}>
+                    <Row to={`/cobros/${payment.id}`} state={FROM_LIST_STATE} $previous={previous}>
                       <strong>{placeOf(payment)}</strong>
                       <Sub>
                         {paymentConcept(payment)} · {dueLabel(payment, debt.as_of_date)}

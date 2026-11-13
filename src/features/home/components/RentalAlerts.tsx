@@ -6,6 +6,7 @@ import {
   Button,
   Dialog,
   DialogActions,
+  FROM_LIST_STATE,
   Icon,
   ListFooter,
   Skeleton,
@@ -249,7 +250,7 @@ function ContractItems({ limit }: { limit?: number }) {
       <Rows>
         {items.map(contract => (
           <li key={contract.id}>
-            <ItemLink to={`/contratos/${contract.id}`}>
+            <ItemLink to={`/contratos/${contract.id}`} state={FROM_LIST_STATE}>
               <strong>
                 {contract.tenant.first_name} {contract.tenant.last_name}
               </strong>
@@ -283,7 +284,7 @@ function UnitItems({ status }: { status: 'available' | 'maintenance' }) {
       <Rows>
         {query.items.map(unit => (
           <li key={unit.id}>
-            <ItemLink to={`/unidades/${unit.id}`}>
+            <ItemLink to={`/unidades/${unit.id}`} state={FROM_LIST_STATE}>
               <strong>{unit.name}</strong>
               <ItemSub>{unit.property.name}</ItemSub>
               <ItemSide>

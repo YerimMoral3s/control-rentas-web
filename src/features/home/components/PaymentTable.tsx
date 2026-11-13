@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import type { Payment } from '@api/payments';
-import { ActionLink, StatusBadge } from '@components';
+import { ActionLink, FROM_LIST_STATE, StatusBadge } from '@components';
 import { formatMoney } from '@lib/format';
 import { dueLabel, paymentConcept, tenantName } from '@lib/paymentText';
 import { PaymentWhatsApp, RegisterPaymentButton } from './PaymentActions';
@@ -127,7 +127,9 @@ export function PaymentRow({ payment, today }: PaymentRowProps) {
       <Actions role="cell">
         <RegisterPaymentButton payment={payment} />
         <PaymentWhatsApp payment={payment} today={today} />
-        <ActionLink to={`/cobros/${payment.id}`}>Ver detalle</ActionLink>
+        <ActionLink to={`/cobros/${payment.id}`} state={FROM_LIST_STATE}>
+          Ver detalle
+        </ActionLink>
       </Actions>
     </Row>
   );

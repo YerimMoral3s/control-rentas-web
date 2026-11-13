@@ -17,6 +17,20 @@ export const paymentConcept = (payment: Payment) => {
   return 'Renta';
 };
 
+/** Título del detalle: "Renta octubre 2026", "Depósito" o el concepto del cargo. */
+export const paymentTitle = (payment: Payment) =>
+  payment.payment_type === 'monthly_rent' && payment.period_year
+    ? `${paymentConcept(payment)} ${payment.period_year}`
+    : paymentConcept(payment);
+
+/** "Renta mensual", "Depósito" o "Cargo adicional". */
+export const paymentTypeLabel = (payment: Payment) =>
+  payment.payment_type === 'monthly_rent'
+    ? 'Renta mensual'
+    : payment.payment_type === 'deposit'
+      ? 'Depósito'
+      : 'Cargo adicional';
+
 /** "Venció el 5 oct.", "Vence hoy" o "Vence el 29 oct.", con la fecha operativa del servidor. */
 export const dueLabel = (payment: Payment, today: string | undefined) => {
   if (payment.status === 'overdue') return `Venció el ${formatShortDate(payment.due_date)}`;

@@ -1,5 +1,6 @@
 export { ActionLink, actionLinkStyle, FROM_LIST_STATE, ReturnLink } from './ActionLink';
 export { Button } from './Button';
+export { ContractMark } from './ContractMark';
 export { DetailSection, MutedText, Panel } from './DetailSection';
 export { Dialog, DialogActions } from './Dialog';
 export { FilterChips } from './FilterChips';

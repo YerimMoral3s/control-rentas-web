@@ -28,8 +28,22 @@ export type ContractSummary = {
   property: { id: string; name: string; property_type: PropertyType };
 };
 
-/** Modelo Contract completo (campos de consulta; el depósito se agrega con Contratos). */
+/** Depósito de la continuidad: puede venir de un contrato anterior (origin_contract). */
+export type ContractDeposit = {
+  id: string;
+  status: 'pending' | 'overdue' | 'paid' | 'cancelled';
+  amount: string;
+  due_date: string;
+  paid_at: string | null;
+  origin_contract: { id: string };
+  /** Única devolución activa, si la hay. */
+  refund: { id: string; amount: string; expense_date: string } | null;
+  retained_amount: string;
+};
+
+/** Modelo Contract completo. */
 export type Contract = ContractSummary & {
+  deposit: ContractDeposit | null;
   previous_contract_id: string | null;
   vacated_at: string | null;
   duration_months: number;
@@ -39,6 +53,8 @@ export type Contract = ContractSummary & {
 };
 
 export type ContractListParams = {
+  status?: ContractStatus;
+  search?: string;
   tenant_id?: string;
   unit_id?: string;
   property_id?: string;
@@ -55,6 +71,15 @@ export const getContracts = (params: ContractListParams, signal?: AbortSignal) =
     params,
     signal,
     operation: 'contracts_list',
+  });
+
+/** GET /v1/contracts/:id — contrato actual o histórico, con su depósito. */
+export const getContract = (contractId: string, signal?: AbortSignal) =>
+  apiRequest<Contract>({
+    method: 'GET',
+    url: `/contracts/${encodeURIComponent(contractId)}`,
+    signal,
+    operation: 'contract_detail',
   });
 
 /** GET /v1/contracts con scope=dashboard: contratos activos actuales que terminan en los próximos días. */
