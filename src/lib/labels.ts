@@ -22,7 +22,6 @@ const EXPENSE_TYPE: Record<ExpenseType, string> = {
 export const PAYMENT_TYPES = Object.keys(PAYMENT_TYPE) as PaymentType[];
 export const EXPENSE_TYPES = Object.keys(EXPENSE_TYPE) as ExpenseType[];
 
-export const paymentTypeName = (type: PaymentType) => PAYMENT_TYPE[type];
 export const expenseTypeLabel = (type: ExpenseType) => EXPENSE_TYPE[type];
 
 /** Tipo de un movimiento, sea cobro o gasto. */
