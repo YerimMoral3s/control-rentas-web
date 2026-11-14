@@ -13,6 +13,8 @@ import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
 import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
+import { TenantCreatePage } from '@features/tenants/TenantCreatePage';
+import { TenantEditPage } from '@features/tenants/TenantEditPage';
 import { TenantsPage } from '@features/tenants/TenantsPage';
 import { ProtectedLayout } from './ProtectedLayout';
 
@@ -38,7 +40,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'inquilinos', element: <TenantsPage /> },
+      { path: 'inquilinos/nuevo', element: <TenantCreatePage /> },
       { path: 'inquilinos/:tenantId', element: <TenantDetailPage /> },
+      { path: 'inquilinos/:tenantId/editar', element: <TenantEditPage /> },
       { path: 'movimientos', element: <MovementsPage /> },
       { path: 'gastos/:expenseId', element: <ExpenseDetailPage /> },
       { path: 'propiedades', element: <PropertiesPage /> },

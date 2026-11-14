@@ -74,3 +74,39 @@ export const getTenant = (tenantId: string, signal?: AbortSignal) =>
     signal,
     operation: 'tenant_detail',
   });
+
+/** Datos que captura la usuaria (FE-04: alias y otro teléfono son opcionales). */
+export type TenantInput = {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  alias: string | null;
+  secondary_phone: string | null;
+};
+
+/** POST /v1/tenants — 201 con el inquilino creado. */
+export const createTenant = (body: TenantInput) =>
+  apiRequest<Tenant>({ method: 'POST', url: '/tenants', data: body, operation: 'tenant_create' });
+
+/** PATCH /v1/tenants/:id — solo los campos que cambiaron (al menos uno). */
+export const updateTenant = ({
+  tenantId,
+  changes,
+}: {
+  tenantId: string;
+  changes: Partial<TenantInput>;
+}) =>
+  apiRequest<Tenant>({
+    method: 'PATCH',
+    url: `/tenants/${encodeURIComponent(tenantId)}`,
+    data: changes,
+    operation: 'tenant_update',
+  });
+
+/** PATCH /v1/tenants/:id/deactivate — baja lógica; 409 si conserva una ocupación actual. */
+export const deactivateTenant = (tenantId: string) =>
+  apiRequest<{ id: string; status: 'inactive'; deactivated_at: string | null }>({
+    method: 'PATCH',
+    url: `/tenants/${encodeURIComponent(tenantId)}/deactivate`,
+    operation: 'tenant_deactivate',
+  });

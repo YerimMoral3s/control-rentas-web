@@ -5,7 +5,7 @@ import {
   type FocusEvent,
   type ReactNode,
 } from 'react';
-import { formatMoneyInput, sanitizeMoney, sanitizePhone } from '@lib/numericInput';
+import { formatMoneyInput, phoneCaret, sanitizeMoney, sanitizePhone } from '@lib/numericInput';
 import { Icon } from '../Icon';
 import {
   Control,
@@ -28,7 +28,7 @@ type TextFieldProps = Omit<ComponentPropsWithRef<'input'>, 'prefix'> & {
   suffix?: ReactNode;
   /**
    * money: solo dígitos y punto (2 decimales), con separador de miles al salir del campo.
-   * phone: solo dígitos y espacios.
+   * phone: teléfono de México, máximo 10 dígitos con máscara "55 12 34 56 78".
    */
   format?: 'money' | 'phone';
 };
@@ -62,7 +62,21 @@ export function TextField({
 
   // Se limpia el valor del propio input antes de avisar al formulario (funciona también con react-hook-form).
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (format) event.currentTarget.value = SANITIZERS[format](event.currentTarget.value);
+    const input = event.currentTarget;
+    if (format === 'phone') {
+      // La máscara agrega espacios; el cursor se queda junto al mismo dígito.
+      const caret = input.selectionStart ?? input.value.length;
+      const pasted = (event.nativeEvent as InputEvent).inputType === 'insertFromPaste';
+      const before = input.value;
+      input.value = sanitizePhone(before, pasted);
+      const stripped = before.replace(/\D/g, '').length - input.value.replace(/\D/g, '').length;
+      const digitsBefore =
+        before.slice(0, caret).replace(/\D/g, '').length - (pasted ? stripped : 0);
+      const position = phoneCaret(input.value, Math.min(digitsBefore, 10));
+      input.setSelectionRange(position, position);
+    } else if (format) {
+      input.value = SANITIZERS[format](input.value);
+    }
     onChange?.(event);
   };
 

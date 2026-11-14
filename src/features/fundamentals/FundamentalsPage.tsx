@@ -175,7 +175,7 @@ export function FundamentalsPage() {
             label="Teléfono del inquilino"
             format="phone"
             defaultValue="55 123"
-            error="Escribe los 10 dígitos. Ejemplo: 55 1234 5678."
+            error="Escribe un teléfono de 10 dígitos, por ejemplo 55 12 34 56 78."
           />
           <TextField
             label="Fecha de inicio"
