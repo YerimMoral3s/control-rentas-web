@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import type { Tenant } from '@api/tenants';
-import { Button, FROM_LIST_STATE, Icon, StatusBadge } from '@components';
+import { ButtonLink, FROM_LIST_STATE, Icon, StatusBadge } from '@components';
 import { formatPhone } from '@lib/format';
 import { fullName, placeName } from '../tenantText';
 import { DebtLabel } from './DebtLabel';
@@ -208,9 +208,9 @@ export function TenantQuickView({ tenant, onClose }: TenantQuickViewProps) {
         </Block>
       </Body>
       <Foot>
-        <Button variant="neutral" disabled title="Disponible próximamente">
+        <ButtonLink variant="neutral" to={`/inquilinos/${tenant.id}/editar`}>
           Editar
-        </Button>
+        </ButtonLink>
         <DetailLink to={`/inquilinos/${tenant.id}`} state={FROM_LIST_STATE}>
           Ver detalle
         </DetailLink>

@@ -18,7 +18,7 @@ import { useContract } from '@hooks/querys/contracts';
 import { formatDateRange, formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { placeName } from '@lib/place';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { ContractPayments } from './components/ContractPayments';
 import { ContractSummaryBlocks } from './components/ContractSummary';
 import { contractKindLine, terminationDate } from './contractText';
@@ -38,8 +38,7 @@ const Header = styled.header`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 

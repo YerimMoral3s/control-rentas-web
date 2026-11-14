@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
+import { pageTitle } from '@styles/theme';
 
 const Header = styled.header`
   display: flex;
@@ -15,8 +16,7 @@ const TitleRow = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 

@@ -20,6 +20,11 @@ const List = styled.div`
 const Chip = styled.button<{ $active: boolean }>`
   flex: none;
   height: ${({ theme }) => theme.size.touch};
+
+  ${media.compact} {
+    height: 40px;
+  }
+
   padding: 0 14px;
   display: inline-flex;
   align-items: center;

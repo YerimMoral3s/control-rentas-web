@@ -2,9 +2,15 @@ import { useId, useState, type ComponentPropsWithRef } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 import { Control, ErrorText, FieldRoot, Input, Label } from '../TextField/styles';
+import { media } from '@styles/theme';
 
 const ToggleButton = styled.button`
   height: 44px;
+
+  ${media.compact} {
+    height: 38px;
+  }
+
   margin-right: -10px;
   padding: 0 10px;
   border: 0;

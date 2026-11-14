@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoneyInput, sanitizeMoney, sanitizePhone } from './numericInput';
+import { formatMoneyInput, phoneCaret, sanitizeMoney, sanitizePhone } from './numericInput';
 
 describe('campos numéricos', () => {
   it('el importe solo acepta dígitos y un punto con hasta 2 decimales', () => {
@@ -15,7 +15,15 @@ describe('campos numéricos', () => {
   });
 
   it('el teléfono solo acepta dígitos y espacios', () => {
-    expect(sanitizePhone('55 123asdasdasdsadas')).toBe('55 123');
-    expect(sanitizePhone('55-1234-5678')).toBe('5512345678');
+    expect(sanitizePhone('55 123asdasdasdsadas')).toBe('55 12 3');
+    expect(sanitizePhone('55-1234-5678')).toBe('55 12 34 56 78');
+    expect(sanitizePhone('5512345678999')).toBe('55 12 34 56 78');
+    expect(sanitizePhone('+52 55 1234 5678', true)).toBe('55 12 34 56 78');
+    expect(sanitizePhone('5212345678')).toBe('52 12 34 56 78');
+  });
+
+  it('deja el cursor junto al mismo dígito al aplicar la máscara', () => {
+    expect(phoneCaret('55 12 34', 3)).toBe(4);
+    expect(phoneCaret('55 12 34', 0)).toBe(0);
   });
 });

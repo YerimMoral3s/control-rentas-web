@@ -25,7 +25,7 @@ import { formatMoney } from '@lib/format';
 import { dueLabel, paymentTitle, paymentTypeLabel, whatsappMessage } from '@lib/paymentText';
 import { placeName } from '@lib/place';
 import { whatsappUrl } from '@lib/whatsapp';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 
 const Page = styled.div`
   width: 100%;
@@ -42,8 +42,7 @@ const Header = styled.header`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 
@@ -93,6 +92,11 @@ const Actions = styled.div`
 
 const WhatsAppLink = styled.a`
   min-height: ${({ theme }) => theme.size.touchPrimary};
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   padding: 0 16px;
   display: inline-flex;
   align-items: center;

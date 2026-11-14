@@ -63,6 +63,11 @@ const alertTone = {
 
 const alertStyle = css<{ $tone: keyof typeof alertTone }>`
   min-height: ${({ theme }) => theme.size.touch};
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   padding: 0 14px;
   display: inline-flex;
   align-items: center;
@@ -177,6 +182,11 @@ const UnitRow = styled.li`
 const rowActionStyle = css`
   margin-left: auto;
   min-height: ${({ theme }) => theme.size.touch};
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   padding: 0 10px;
   border: 0;
   border-radius: ${({ theme }) => theme.radius.control};

@@ -18,7 +18,7 @@ import { useAttentionPayments } from '@hooks/querys/payments';
 import { monthRange } from '@lib/dates';
 import { EXPENSE_TYPES, movementTypeName, PAYMENT_TYPES } from '@lib/labels';
 import { useMediaQuery } from '@lib/useMediaQuery';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { HeaderRow, MovementList } from './components/MovementList';
 
 const SEARCH_DEBOUNCE_MS = 350;
@@ -52,8 +52,7 @@ const Head = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 
   p {
@@ -77,6 +76,11 @@ const Filters = styled.div`
 
 const Select = styled.select`
   min-height: ${({ theme }) => theme.size.touch};
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   padding: 0 36px 0 14px;
   border: 1px solid ${({ theme }) => theme.color.neutral300};
   border-radius: ${({ theme }) => theme.radius.control};

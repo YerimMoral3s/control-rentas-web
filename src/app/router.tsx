@@ -11,8 +11,11 @@ import { MovementsPage } from '@features/movements/MovementsPage';
 import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
 import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
+import { PropertyNewPage, PropertySetupPage } from '@features/properties/setup/PropertySetupPage';
 import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
+import { TenantCreatePage } from '@features/tenants/TenantCreatePage';
+import { TenantEditPage } from '@features/tenants/TenantEditPage';
 import { TenantsPage } from '@features/tenants/TenantsPage';
 import { ProtectedLayout } from './ProtectedLayout';
 
@@ -38,11 +41,15 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'inquilinos', element: <TenantsPage /> },
+      { path: 'inquilinos/nuevo', element: <TenantCreatePage /> },
       { path: 'inquilinos/:tenantId', element: <TenantDetailPage /> },
+      { path: 'inquilinos/:tenantId/editar', element: <TenantEditPage /> },
       { path: 'movimientos', element: <MovementsPage /> },
       { path: 'gastos/:expenseId', element: <ExpenseDetailPage /> },
       { path: 'propiedades', element: <PropertiesPage /> },
+      { path: 'propiedades/nueva', element: <PropertyNewPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
+      { path: 'propiedades/:propertyId/configurar/:step?', element: <PropertySetupPage /> },
       { path: 'contratos', element: <ContractsPage /> },
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },
       { path: 'contratos/:contractId', element: <ContractDetailPage /> },

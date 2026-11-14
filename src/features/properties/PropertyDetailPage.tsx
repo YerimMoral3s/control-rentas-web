@@ -7,6 +7,7 @@ import {
   Icon,
   ListFooter,
   MutedText,
+  ButtonLink,
   Notice,
   Panel,
   ReturnLink,
@@ -30,7 +31,6 @@ import {
   propertyTypeLabel,
   unitCountLabel,
   unitStatusSummary,
-  unitTypeLabel,
 } from './propertyText';
 
 const Address = styled.span`
@@ -49,7 +49,11 @@ function IncompleteNotice({ property }: { property: Property }) {
     <Notice
       tone="warning"
       title="Falta terminar esta propiedad"
-      action={<Button {...comingSoon}>Continuar configuración</Button>}
+      action={
+        <ButtonLink to={`/propiedades/${property.id}/configurar`}>
+          Continuar configuración
+        </ButtonLink>
+      }
     >
       Todavía no aparece en Inicio. {reviewed_units} de {total_units} unidades revisadas.
     </Notice>
@@ -108,12 +112,8 @@ function SingleUnitProperty({ property }: { property: Property }) {
   return (
     <>
       <DetailHeader
-        title={unit?.name ?? property.name}
-        subtitle={
-          unit
-            ? `${property.name} · ${unitTypeLabel(unit.unit_type)}`
-            : propertyTypeLabel(property.property_type)
-        }
+        title={property.name}
+        subtitle={propertyTypeLabel(property.property_type)}
         badge={unit && unit.status !== 'inactive' ? <StatusBadge status={unit.status} /> : null}
       >
         <Address>{addressLine(property)}</Address>

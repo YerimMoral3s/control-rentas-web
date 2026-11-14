@@ -46,6 +46,8 @@ type OptionGroupProps<T extends string> = {
   value: T | undefined;
   options: ReadonlyArray<{ value: T; label: string }>;
   onChange: (value: T) => void;
+  /** La etiqueta solo para lectores de pantalla (el contexto ya se ve, p. ej. en una fila). */
+  hideLabel?: boolean;
 };
 
 /** Selector de F-03 para hasta 4 opciones: botones de opción con radios nativos (teclado incluido). */
@@ -54,13 +56,14 @@ export function OptionGroup<T extends string>({
   value,
   options,
   onChange,
+  hideLabel = false,
 }: OptionGroupProps<T>) {
   const name = useId();
   const labelId = `${name}-label`;
 
   return (
     <Group role="radiogroup" aria-labelledby={labelId}>
-      <Label as="span" id={labelId}>
+      <Label as="span" id={labelId} className={hideLabel ? 'visually-hidden' : undefined}>
         {label}
       </Label>
       <Options>

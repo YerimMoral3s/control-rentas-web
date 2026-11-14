@@ -2,10 +2,20 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import styled from 'styled-components';
 import { useDebounce } from 'use-debounce';
-import { Button, ListFooter, SearchField, SectionError, Skeleton, StateMessage } from '@components';
+import {
+  Button,
+  ButtonLink,
+  ListFooter,
+  Notice,
+  SearchField,
+  SectionError,
+  Skeleton,
+  StateMessage,
+} from '@components';
 import { useTenants } from '@hooks/querys/tenants';
 import { useMediaQuery } from '@lib/useMediaQuery';
-import { media, theme as tokens } from '@styles/theme';
+import { useResultNotice } from '@lib/useResultNotice';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import {
   Cards,
   Table,
@@ -36,8 +46,7 @@ const Head = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 
@@ -60,12 +69,11 @@ const ListColumn = styled.div`
   flex-direction: column;
 `;
 
-/** Crear inquilino es una escritura de la fase 4: se muestra deshabilitado, sin simular. */
 function CreateTenantButton() {
   return (
-    <Button icon="plus" disabled title="Disponible próximamente">
+    <ButtonLink icon="plus" to="/inquilinos/nuevo">
       Crear inquilino
-    </Button>
+    </ButtonLink>
   );
 }
 
@@ -81,6 +89,7 @@ export function TenantsPage() {
   const [debouncedSearch] = useDebounce(search.trim(), SEARCH_DEBOUNCE_MS);
   const query = useTenants(debouncedSearch);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { result, dismiss } = useResultNotice();
 
   const items = query.items;
   const selected = isWide ? items.find(tenant => tenant.id === selectedId) : undefined;
@@ -94,6 +103,11 @@ export function TenantsPage() {
 
   const header = (
     <>
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
       <Head>
         <h1>Inquilinos</h1>
         <CreateTenantButton />
@@ -142,6 +156,7 @@ export function TenantsPage() {
         kind="empty"
         title="Aún no hay inquilinos registrados"
         description="Cuando agregues a las personas que te rentan, aquí verás su contacto y sus pagos."
+        action={<CreateTenantButton />}
       />
     );
   } else {

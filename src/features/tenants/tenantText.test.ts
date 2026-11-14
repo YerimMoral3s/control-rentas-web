@@ -49,14 +49,14 @@ describe('textos de inquilino', () => {
     expect(hasOverdueDebt(tenant([], '950.00'))).toBe(true);
   });
 
-  it('escribe casa y bodega junto a su propiedad, y el resto como propiedad / unidad (FE-14)', () => {
+  it('escribe casa y bodega solo con su propiedad, y el resto como propiedad / unidad (FE-14)', () => {
     const place = (
       property_type: 'house' | 'warehouse' | 'building',
       property: string,
       name: string,
     ) => placeName({ name, property: { name: property, property_type } });
-    expect(place('house', 'Fraccionamiento Sol', 'Casa 1')).toBe('Casa 1 · Fraccionamiento Sol');
-    expect(place('warehouse', 'Bodegas Norte', 'Bodega 2')).toBe('Bodega 2 · Bodegas Norte');
+    expect(place('house', 'Casa Sol', 'Casa completa')).toBe('Casa Sol');
+    expect(place('warehouse', 'Bodega Norte', 'Bodega')).toBe('Bodega Norte');
     expect(place('building', 'Torre Centro', 'Departamento 203')).toBe(
       'Torre Centro / Departamento 203',
     );

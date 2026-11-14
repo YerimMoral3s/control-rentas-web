@@ -1,10 +1,22 @@
+import { useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
-import { Button, Icon, ReturnLink, SectionError, Skeleton, StateMessage } from '@components';
+import {
+  ActionMenu,
+  Button,
+  ButtonLink,
+  Notice,
+  ReturnLink,
+  SectionError,
+  Skeleton,
+  StateMessage,
+} from '@components';
 import { useTenant } from '@hooks/querys/tenants';
 import { formatPhone } from '@lib/format';
-import { media, theme as tokens } from '@styles/theme';
+import { useResultNotice } from '@lib/useResultNotice';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { CurrentUnitsSection, HistorySection } from './components/ContractSections';
+import { DeleteTenantDialog } from './components/DeleteTenantDialog';
 import { OverdueSection } from './components/OverdueSection';
 import { fullName, rentingLine } from './tenantText';
 
@@ -23,8 +35,7 @@ const Header = styled.header`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 
@@ -71,6 +82,8 @@ const Actions = styled.div`
 export function TenantDetailPage() {
   const { tenantId } = useParams();
   const query = useTenant(tenantId);
+  const { result, dismiss } = useResultNotice();
+  const [deleting, setDeleting] = useState(false);
 
   const back = <ReturnLink to="/inquilinos" label="Inquilinos" />;
 
@@ -107,6 +120,11 @@ export function TenantDetailPage() {
   return (
     <Page>
       {back}
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
       <Header>
         <h1>{fullName(tenant)}</h1>
         <Subtitle>{rentingLine(tenant)}</Subtitle>
@@ -128,7 +146,7 @@ export function TenantDetailPage() {
             </div>
           ) : null}
         </Contact>
-        {/* Acciones de escritura de fases 4 y 5: visibles pero deshabilitadas, sin simular. */}
+        {/* Crear contrato es de la fase 5: visible pero deshabilitado, sin simular. */}
         <Actions>
           <Button
             variant={renting ? 'secondary' : 'primary'}
@@ -137,22 +155,20 @@ export function TenantDetailPage() {
           >
             Crear contrato
           </Button>
-          <Button variant="neutral" disabled title="Disponible próximamente">
+          <ButtonLink variant="neutral" to={`/inquilinos/${tenant.id}/editar`}>
             Editar
-          </Button>
-          <Button
-            variant="neutral"
-            disabled
-            title="Disponible próximamente"
-            aria-label="Más acciones"
-          >
-            <Icon name="more" size={20} />
-          </Button>
+          </ButtonLink>
+          <ActionMenu
+            items={[
+              { label: 'Eliminar inquilino', danger: true, onSelect: () => setDeleting(true) },
+            ]}
+          />
         </Actions>
       </Header>
       <OverdueSection tenant={tenant} />
       <CurrentUnitsSection tenantId={tenant.id} count={tenant.current_contracts.length} />
       <HistorySection tenantId={tenant.id} />
+      <DeleteTenantDialog tenant={tenant} open={deleting} onClose={() => setDeleting(false)} />
     </Page>
   );
 }

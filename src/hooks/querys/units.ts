@@ -1,10 +1,21 @@
-import { getDashboardUnits, getUnit, getUnits } from '@api/units';
+import { useMutation } from '@tanstack/react-query';
+import {
+  createUnit,
+  createUnitsBulk,
+  getDashboardUnits,
+  getUnit,
+  getUnits,
+  reviewUnit,
+  type Unit,
+} from '@api/units';
+import type { ApiSuccess } from '@api/types';
 import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
 
 export const UnitsQueryKeys = {
   root: ['units'] as const,
   dashboard: (status: 'available' | 'maintenance') => ['units', 'dashboard', status] as const,
   byProperty: (propertyId: string) => ['units', 'list', propertyId] as const,
+  allOfProperty: (propertyId: string) => ['units', 'list', propertyId, 'all'] as const,
   detail: (unitId: string) => ['units', 'detail', unitId] as const,
 };
 
@@ -36,3 +47,34 @@ export const useUnit = (unitId: string | undefined) =>
       enabled: Boolean(unitId),
     },
   );
+
+/**
+ * Configuración (P-07 a P-11): todas las unidades de la propiedad, página por página de 100,
+ * para revisar nombres repetidos y pendientes sin depender del scroll.
+ */
+export const useAllPropertyUnits = (propertyId: string | undefined) =>
+  useBaseQuery(
+    UnitsQueryKeys.allOfProperty(propertyId ?? ''),
+    async (signal): Promise<ApiSuccess<Unit[]>> => {
+      const items: Unit[] = [];
+      for (let page = 1; ; page += 1) {
+        const response = await getUnits(
+          { property_id: propertyId ?? '', page, page_size: QueryPageSize.max },
+          signal,
+        );
+        items.push(...response.data);
+        if (!response.meta.pagination.has_next) return { data: items, meta: response.meta };
+      }
+    },
+    QueryStaleTime.operational,
+    { enabled: Boolean(propertyId) },
+  );
+
+/** P-07: la única unidad de casa o bodega. Nunca se reintenta sola. */
+export const useCreateUnit = () => useMutation({ retry: false, mutationFn: createUnit });
+
+/** P-08: un grupo de unidades (se crean todas o ninguna). */
+export const useCreateUnitsBulk = () => useMutation({ retry: false, mutationFn: createUnitsBulk });
+
+/** P-09: estado de hoy de una unidad durante la configuración. */
+export const useReviewUnit = () => useMutation({ retry: false, mutationFn: reviewUnit });

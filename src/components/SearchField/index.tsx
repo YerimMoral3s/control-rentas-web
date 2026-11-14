@@ -2,6 +2,7 @@ import { useId, useRef } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 import { Control, Input } from '../TextField/styles';
+import { media } from '@styles/theme';
 
 const SearchControl = styled(Control)`
   padding-right: 4px;
@@ -26,6 +27,12 @@ const SearchControl = styled(Control)`
 const ClearButton = styled.button`
   width: 44px;
   height: 44px;
+
+  ${media.compact} {
+    width: 38px;
+    height: 38px;
+  }
+
   flex: none;
   display: flex;
   align-items: center;

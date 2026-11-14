@@ -3,7 +3,7 @@ import { refreshTokens } from '@api/auth';
 import { isAppError } from '@api/errors';
 import { setAuthHandlers } from '@api/http';
 import { queryClient } from '@app/queryClient';
-import { useAuth } from '@stores';
+import { useAuth, useRentedDrafts } from '@stores';
 import { broadcastSession, type SessionMessage } from './sessionChannel';
 
 /** Se renueva por adelantado si al access token le queda menos que esto. */
@@ -24,6 +24,7 @@ export const expireSession = () => {
 /** Retira todo el contexto de la cuenta: caché de consultas y sesión local. No borra registros. */
 export const clearSessionData = () => {
   queryClient.clear();
+  useRentedDrafts.getState().reset();
   useAuth.getState().reset();
 };
 

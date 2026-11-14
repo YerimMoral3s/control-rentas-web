@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { StateMessage } from '@components';
+import { pageTitle } from '@styles/theme';
 
 export const PageTitle = styled.h1`
   margin: 0 0 20px;
-  font-size: 28px;
-  line-height: 34px;
+  ${pageTitle}
   font-weight: 700;
 `;
 

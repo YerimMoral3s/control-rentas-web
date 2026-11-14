@@ -83,7 +83,7 @@ const Secondary = styled.div`
   }
 `;
 
-/** Lugar del cobro: la parte principal en negritas (unidad en casa/bodega, propiedad en el resto). */
+/** Lugar del cobro: la propiedad en negritas y, si tiene varias unidades, la unidad. */
 export function PlaceText({ payment }: { payment: Payment }) {
   const { primary, separator, secondary } = placeParts(payment.unit.name, payment.property);
   return (

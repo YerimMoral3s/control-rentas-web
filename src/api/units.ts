@@ -66,3 +66,39 @@ export const getUnit = (unitId: string, signal?: AbortSignal) =>
     signal,
     operation: 'unit_detail',
   });
+
+/** POST /v1/units — una unidad (casa o bodega: su única unidad). Queda sin revisar. */
+export const createUnit = (body: { property_id: string; name: string; unit_type: UnitType }) =>
+  apiRequest<Unit>({ method: 'POST', url: '/units', data: body, operation: 'unit_create' });
+
+type UnitBlock = {
+  unit_type: UnitType;
+  quantity: number;
+  /** Debe contener {n}; se reemplaza por el número de cada unidad. */
+  naming_pattern: string;
+  start_at: number;
+};
+
+/** POST /v1/units/bulk — crea el grupo completo o ninguna (operación atómica). */
+export const createUnitsBulk = (body: { property_id: string; blocks: UnitBlock[] }) =>
+  apiRequest<{ created_count: number; items: Unit[] }>({
+    method: 'POST',
+    url: '/units/bulk',
+    data: body,
+    operation: 'units_bulk_create',
+  });
+
+/** POST /v1/units/:id/review — estado de hoy durante la configuración. */
+export const reviewUnit = ({
+  unitId,
+  status,
+}: {
+  unitId: string;
+  status: 'available' | 'maintenance' | 'occupied';
+}) =>
+  apiRequest<Unit>({
+    method: 'POST',
+    url: `/units/${encodeURIComponent(unitId)}/review`,
+    data: { status },
+    operation: 'unit_review',
+  });

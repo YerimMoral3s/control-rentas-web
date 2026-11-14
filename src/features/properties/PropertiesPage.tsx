@@ -1,9 +1,18 @@
 import { useSearchParams } from 'react-router';
 import styled from 'styled-components';
 import { useDebounce } from 'use-debounce';
-import { Button, ListFooter, SearchField, SectionError, Skeleton, StateMessage } from '@components';
+import {
+  Button,
+  ButtonLink,
+  ListFooter,
+  Notice,
+  SearchField,
+  SectionError,
+  Skeleton,
+  StateMessage,
+} from '@components';
 import { useProperties } from '@hooks/querys/properties';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import {
   IncompletePropertyRow,
   List,
@@ -11,6 +20,7 @@ import {
   PropertyRow,
   TableBox,
 } from './components/PropertyList';
+import { useResultNotice } from '@lib/useResultNotice';
 
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -32,8 +42,7 @@ const Head = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 
@@ -58,15 +67,20 @@ export function PropertiesPage() {
   const [debouncedSearch] = useDebounce(search.trim(), SEARCH_DEBOUNCE_MS);
   const incomplete = useProperties('in_progress', debouncedSearch);
   const complete = useProperties('completed', debouncedSearch);
+  const { result, dismiss } = useResultNotice();
 
   const header = (
     <>
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
       <Head>
         <h1>Propiedades</h1>
-        {/* Alta de propiedad: recorrido de la fase 4; deshabilitado sin simular. */}
-        <Button icon="plus" disabled title="Disponible próximamente">
+        <ButtonLink icon="plus" to="/propiedades/nueva">
           Agregar propiedad
-        </Button>
+        </ButtonLink>
       </Head>
       <Search>
         <SearchField

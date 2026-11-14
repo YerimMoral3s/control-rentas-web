@@ -6,7 +6,7 @@ import { Button, Logo, Notice, PasswordField, TextField } from '@components';
 import { useLogin } from '@hooks/querys/auth';
 import { startSession } from '@session/session';
 import { useAuth } from '@stores';
-import { media, theme } from '@styles/theme';
+import { media, theme, pageTitle } from '@styles/theme';
 import { describeLoginError, EMAIL_RULES, PASSWORD_RULES, type LoginFailure } from './loginErrors';
 
 const Page = styled.div`
@@ -63,8 +63,7 @@ const LogoSlot = styled.div`
 
 const Title = styled.h1`
   margin: 0;
-  font-size: 28px;
-  line-height: 34px;
+  ${pageTitle}
   font-weight: 700;
 `;
 
