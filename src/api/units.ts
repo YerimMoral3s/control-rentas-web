@@ -1,4 +1,5 @@
 import type { ContractStatus } from './contracts';
+import type { PropertyType } from './properties';
 import { apiRequest } from './http';
 import type { PaginatedMeta } from './types';
 
@@ -13,7 +14,8 @@ export type UnitSummary = {
   name: string;
   status: UnitStatus;
   current_contract: { id: string; status: ContractStatus } | null;
-  property: { id: string; name: string };
+  /** FE-30: el tipo permite mostrar casa y bodega solo con el nombre de la propiedad. */
+  property: { id: string; name: string; property_type: PropertyType };
 };
 
 /** GET /v1/units con scope=dashboard: unidades revisadas de propiedades completas, por estado. */
@@ -101,4 +103,27 @@ export const reviewUnit = ({
     url: `/units/${encodeURIComponent(unitId)}/review`,
     data: { status },
     operation: 'unit_review',
+  });
+
+/** PATCH /v1/units/:id — nombre o Disponible ↔ En mantenimiento (U-04, U-05, P-15). */
+export const updateUnit = ({
+  unitId,
+  changes,
+}: {
+  unitId: string;
+  changes: { name?: string; status?: 'available' | 'maintenance' };
+}) =>
+  apiRequest<Unit>({
+    method: 'PATCH',
+    url: `/units/${encodeURIComponent(unitId)}`,
+    data: changes,
+    operation: 'unit_update',
+  });
+
+/** PATCH /v1/units/:id/deactivate — eliminar unidad (baja lógica); bloqueada si alguien la renta. */
+export const deactivateUnit = (unitId: string) =>
+  apiRequest<{ id: string; status: 'inactive'; deactivated_at: string | null }>({
+    method: 'PATCH',
+    url: `/units/${encodeURIComponent(unitId)}/deactivate`,
+    operation: 'unit_deactivate',
   });

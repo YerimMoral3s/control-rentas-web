@@ -18,7 +18,7 @@ export const useInvalidateEvents = () => {
 
   return {
     /** Inquilino nuevo: aparece en la lista y en búsquedas. */
-    tenantCreated: () => invalidate([TenantsQueryKeys.listRoot]),
+    tenantCreated: () => invalidate([TenantsQueryKeys.catalog]),
     /** Nombre o teléfono cambiaron: se muestran también en contratos, cobros y movimientos. */
     tenantUpdated: (tenantId: string) =>
       invalidate([
@@ -31,7 +31,7 @@ export const useInvalidateEvents = () => {
     /** Baja lógica: sale de la lista. Sus contratos y cobros se conservan. */
     tenantDeactivated: (tenantId: string) =>
       invalidate([
-        TenantsQueryKeys.listRoot,
+        TenantsQueryKeys.catalog,
         TenantsQueryKeys.detail(tenantId),
         DashboardQueryKeys.root,
       ]),
@@ -50,6 +50,37 @@ export const useInvalidateEvents = () => {
     /** Propiedad eliminada: sale de Propiedades, de Inicio y de las búsquedas. */
     propertyDeactivated: () =>
       invalidate([PropertiesQueryKeys.root, UnitsQueryKeys.root, DashboardQueryKeys.root]),
+    /**
+     * Renta actual guardada (P-10): contrato, cobros y depósito nuevos; la unidad queda Ocupada y
+     * el inquilino tiene una ocupación más.
+     */
+    preexistingContractCreated: (tenantId: string) =>
+      invalidate([
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        UnitsQueryKeys.root,
+        PropertiesQueryKeys.root,
+        TenantsQueryKeys.detail(tenantId),
+        TenantsQueryKeys.catalog,
+        DashboardQueryKeys.root,
+      ]),
+    /**
+     * Unidad editada, enviada a mantenimiento, disponible o eliminada: cambia su detalle, la
+     * propiedad (conteos, avance) e Inicio (disponibles y en mantenimiento).
+     */
+    unitChanged: () =>
+      invalidate([UnitsQueryKeys.root, PropertiesQueryKeys.root, DashboardQueryKeys.root]),
+    /** Nombre de unidad o propiedad corregido (P-15): se muestra en contratos, cobros e inquilinos. */
+    placeRenamed: () =>
+      invalidate([
+        UnitsQueryKeys.root,
+        PropertiesQueryKeys.root,
+        DashboardQueryKeys.root,
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        MovementsQueryKeys.root,
+        TenantsQueryKeys.root,
+      ]),
     /** Configuración completa: la propiedad y sus unidades entran a Inicio. */
     propertyCompleted: (propertyId: string) =>
       invalidate([

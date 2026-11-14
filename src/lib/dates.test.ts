@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   civilDateOf,
+  contractEndDate,
   formatDateRange,
   formatDateTime,
   formatDayHeading,
@@ -52,5 +53,18 @@ describe('fechas civiles', () => {
       from: '2025-12-01',
       to: '2025-12-31',
     });
+  });
+});
+
+describe('fin de contrato preexistente (misma regla que BACK)', () => {
+  it('inicio + duración − 1 día', () => {
+    expect(contractEndDate('2026-03-01', 12)).toBe('2027-02-28');
+    expect(contractEndDate('2025-10-01', 12)).toBe('2026-09-30');
+    expect(contractEndDate('2026-06-15', 6)).toBe('2026-12-14');
+  });
+
+  it('acota el día al último del mes destino', () => {
+    expect(contractEndDate('2026-08-31', 6)).toBe('2027-02-27');
+    expect(contractEndDate('2027-08-31', 6)).toBe('2028-02-28');
   });
 });

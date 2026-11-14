@@ -112,6 +112,8 @@ export const clampLines = (lines: number) => `
  * para que palabras como "Propiedades" quepan junto a su botón (acuerdo del 13 nov.).
  */
 export const pageTitle = `
+  text-wrap: balance;
+  overflow-wrap: break-word;
   font-size: 24px;
   line-height: 30px;
 

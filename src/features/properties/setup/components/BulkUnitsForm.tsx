@@ -88,7 +88,10 @@ type BulkUnitsFormProps = {
   onUnitTypeChange: (type: UnitType) => void;
   /** Volver a unidades conserva lo escrito (el formulario sigue montado arriba). */
   onClose: () => void;
-  onCreated: () => void;
+  /** Texto de la salida; por defecto "Volver a unidades" (en P-14, "Volver a <propiedad>"). */
+  closeLabel?: string;
+  /** Cuántas creó el servidor y de qué tipo. */
+  onCreated: (created: { count: number; unitType: UnitType }) => void;
 };
 
 /**
@@ -101,6 +104,7 @@ export function BulkUnitsForm({
   unitType,
   onUnitTypeChange,
   onClose,
+  closeLabel = 'Volver a unidades',
   onCreated,
 }: BulkUnitsFormProps) {
   const events = useInvalidateEvents();
@@ -137,7 +141,7 @@ export function BulkUnitsForm({
     setFailure(null);
     if (repeated.length > 0) return;
     try {
-      await bulk.mutateAsync({
+      const { data } = await bulk.mutateAsync({
         property_id: property.id,
         blocks: [
           {
@@ -149,7 +153,7 @@ export function BulkUnitsForm({
         ],
       });
       await events.unitsChanged(property.id);
-      onCreated();
+      onCreated({ count: data.created_count, unitType });
     } catch (error) {
       const marked = applyFieldErrors(error, setError, {
         'blocks.0.quantity': 'Escribe cuántas quieres crear.',
@@ -209,7 +213,8 @@ export function BulkUnitsForm({
       ) : null}
       <TextField
         label="Cantidad"
-        inputMode="numeric"
+        format="digits"
+        maxLength={3}
         autoComplete="off"
         placeholder="Ejemplo: 8"
         disabled={bulk.isPending}
@@ -237,7 +242,8 @@ export function BulkUnitsForm({
         <TextField
           label="Número inicial"
           help="Ejemplo: 101, o 1 para empezar en Local 1"
-          inputMode="numeric"
+          format="digits"
+          maxLength={6}
           autoComplete="off"
           disabled={bulk.isPending}
           error={startError}
@@ -269,7 +275,7 @@ export function BulkUnitsForm({
           {names.length > 0 ? `Crear ${groupCount(unitType, names.length)}` : `Crear ${words.many}`}
         </Button>
         <Button variant="secondary" onClick={onClose} disabled={bulk.isPending}>
-          Volver a unidades
+          {closeLabel}
         </Button>
       </StepFooter>
     </Form>

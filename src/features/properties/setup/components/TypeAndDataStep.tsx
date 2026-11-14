@@ -3,96 +3,26 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import type { Property, PropertyInput, PropertyType } from '@api/properties';
 import type { Unit } from '@api/units';
-import { Button, Notice, TextField } from '@components';
+import { Button, Notice } from '@components';
+import {
+  changedPropertyFields,
+  PROPERTY_FIELD_MESSAGES,
+  PropertyDataFields,
+  propertyValuesOf,
+  toPropertyFields,
+  type PropertyValues,
+} from '@features/properties/components/PropertyDataFields';
 import { useCreateProperty, useUpdateProperty } from '@hooks/querys/properties';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
 import { applyFieldErrors } from '@lib/formErrors';
 import { useMediaQuery } from '@lib/useMediaQuery';
-import { media, theme as tokens } from '@styles/theme';
+import { theme as tokens } from '@styles/theme';
 import { setupFailure, type SetupFailure } from '../setupFailure';
 import { useSetupNavigation } from '../setupNavigation';
 import { groupTypesFor, propertyTypeOption, SINGLE_UNIT, setupSubtitle } from '../setupText';
 import { SetupLayout } from './SetupLayout';
 import { StepFooter, StepIntro, StepPanel } from './stepStyles';
 import { TypeCards } from './TypeCards';
-
-type Values = Omit<PropertyInput, 'property_type'> & {
-  [K in keyof Omit<PropertyInput, 'property_type'>]: string;
-};
-
-const TEXT_FIELDS = [
-  'name',
-  'postal_code',
-  'neighborhood',
-  'street',
-  'external_number',
-  'internal_number',
-  'city',
-  'state',
-  'reference_notes',
-] as const;
-
-const REQUIRED = {
-  name: 'Escribe el nombre de la propiedad.',
-  postal_code: 'Escribe el código postal.',
-};
-
-/** FE-05: largo de cada columna; así un texto largo no termina en error del servidor. */
-const MAX_LENGTH: Partial<Record<keyof Values, number>> = {
-  name: 150,
-  // Código postal de México: 5 dígitos (pedido del usuario, 13 nov.).
-  postal_code: 5,
-  street: 150,
-  external_number: 30,
-  internal_number: 30,
-  neighborhood: 120,
-  city: 120,
-  state: 120,
-};
-
-const POSTAL_CODE_FORMAT = 'Escribe los 5 dígitos del código postal, por ejemplo 03100.';
-
-const SERVER_FIELD_MESSAGES = {
-  ...REQUIRED,
-  postal_code: POSTAL_CODE_FORMAT,
-  property_type: 'Elige el tipo de propiedad.',
-  street: 'Revisa la calle.',
-  external_number: 'Revisa el número exterior.',
-  internal_number: 'Revisa el número interior.',
-  neighborhood: 'Revisa la colonia.',
-  city: 'Revisa la ciudad.',
-  state: 'Revisa el estado.',
-  reference_notes: 'Revisa las referencias.',
-};
-
-const valuesOf = (property: Property | undefined): Values => {
-  const values = {} as Values;
-  for (const field of TEXT_FIELDS) values[field] = property?.[field] ?? '';
-  return values;
-};
-
-const Fields = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const Pair = styled.div`
-  display: grid;
-  gap: 20px;
-
-  ${media.desktop} {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-`;
-
-const Optional = styled.p`
-  margin: 4px 0 -8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.color.neutral600};
-`;
 
 const Chosen = styled.div`
   display: flex;
@@ -144,7 +74,7 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
     handleSubmit,
     setError,
     formState: { errors, dirtyFields },
-  } = useForm<Values>({ defaultValues: valuesOf(property) });
+  } = useForm<PropertyValues>({ defaultValues: propertyValuesOf(property) });
   const saving = create.isPending || update.isPending;
 
   /** Con unidades capturadas solo se ofrecen tipos que las admiten (quitar unidades: fase 4D). */
@@ -167,13 +97,7 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
         missingType();
         return;
       }
-      const input = {} as PropertyInput;
-      for (const field of TEXT_FIELDS) {
-        const value = values[field].trim();
-        (input as Record<string, string | null>)[field] =
-          field === 'name' || field === 'postal_code' ? value : value || null;
-      }
-      input.property_type = type;
+      const input: PropertyInput = { ...toPropertyFields(values), property_type: type };
       try {
         if (!property) {
           const { data } = await create.mutateAsync(input);
@@ -183,9 +107,7 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
           return;
         }
         // Solo lo que cambió (PATCH); si nada cambió, no se guarda nada.
-        const changes: Partial<PropertyInput> = {};
-        for (const field of TEXT_FIELDS)
-          if (dirtyFields[field]) (changes as Record<string, unknown>)[field] = input[field];
+        const changes = changedPropertyFields(values, dirtyFields);
         if (type !== property.property_type) changes.property_type = type;
         if (Object.keys(changes).length > 0) {
           await update.mutateAsync({ propertyId: property.id, changes });
@@ -194,7 +116,7 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
         if (exit) nav.exit();
         else nav.goToStep(property.id, 'unidades');
       } catch (error) {
-        const marked = applyFieldErrors(error, setError, SERVER_FIELD_MESSAGES);
+        const marked = applyFieldErrors(error, setError, PROPERTY_FIELD_MESSAGES);
         setFailure(
           setupFailure(
             error,
@@ -210,32 +132,6 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
     setType(next);
     setTypeError(null);
   };
-
-  const field = (
-    name: keyof Values,
-    label: string,
-    extra?: { help?: string; placeholder?: string; inputMode?: 'numeric' },
-  ) => (
-    <TextField
-      label={label}
-      autoComplete="off"
-      maxLength={MAX_LENGTH[name]}
-      disabled={saving}
-      error={errors[name]?.message}
-      {...extra}
-      {...register(
-        name,
-        name in REQUIRED
-          ? {
-              validate: (value: string) => {
-                if (!value.trim()) return REQUIRED[name as keyof typeof REQUIRED];
-                return name !== 'postal_code' || /^\d{5}$/.test(value.trim()) || POSTAL_CODE_FORMAT;
-              },
-            }
-          : undefined,
-      )}
-    />
-  );
 
   const option = type ? propertyTypeOption(type) : undefined;
 
@@ -312,30 +208,7 @@ export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) 
                 </Button>
               </Chosen>
             ) : null}
-            <Fields>
-              {field('name', 'Nombre de la propiedad', {
-                placeholder:
-                  type === 'house' ? 'Ejemplo: Casa 3' : 'Ejemplo: Torre Centro o Casa 3',
-              })}
-              {field('postal_code', 'Código postal', {
-                placeholder: 'Ejemplo: 03100',
-                inputMode: 'numeric',
-              })}
-              <Optional>Opcional</Optional>
-              {field('neighborhood', 'Ubicación', { help: 'Colonia, fraccionamiento o conjunto' })}
-              {field('street', 'Calle')}
-              <Pair>
-                {field('external_number', 'Número exterior')}
-                {field('internal_number', 'Número interior')}
-              </Pair>
-              <Pair>
-                {field('city', 'Ciudad')}
-                {field('state', 'Estado')}
-              </Pair>
-              {field('reference_notes', 'Referencias', {
-                help: 'Algo que ayude a ubicarla, por ejemplo "frente al parque".',
-              })}
-            </Fields>
+            <PropertyDataFields register={register} errors={errors} saving={saving} type={type} />
           </>
         ) : null}
         <StepFooter>

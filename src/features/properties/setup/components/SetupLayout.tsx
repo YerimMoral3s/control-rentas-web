@@ -25,7 +25,6 @@ const Head = styled.header`
   h1 {
     margin: 0;
     ${pageTitle}
-    overflow-wrap: anywhere;
   }
 
   p {

@@ -18,6 +18,9 @@ export const useSetupNavigation = () => {
   return {
     fromHome,
     stepPath,
+    /** P-10: renta actual de una unidad marcada Rentada. */
+    rentPath: (propertyId: string, unitId: string) =>
+      `/propiedades/${propertyId}/configurar/renta/${unitId}${suffix}`,
     goToStep: (propertyId: string, step: SetupStep | 'listo', replace = false) =>
       void navigate(stepPath(propertyId, step), { replace }),
     /** Guardar y salir (P-13): todo ya está guardado; vuelve a Propiedades con el aviso. */

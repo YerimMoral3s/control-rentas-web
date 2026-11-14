@@ -1,7 +1,10 @@
+import { useMutation } from '@tanstack/react-query';
 import {
+  createPreexistingContract,
   getContract,
   getContracts,
   getExpiringContracts,
+  previewPreexistingContract,
   type ContractListParams,
 } from '@api/contracts';
 import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
@@ -48,3 +51,11 @@ export const useContract = (contractId: string | undefined) =>
     QueryStaleTime.operational,
     { enabled: Boolean(contractId) },
   );
+
+/** P-10 / C-18: revisión del servidor (no crea nada). Nunca se reintenta sola. */
+export const usePreviewPreexistingContract = () =>
+  useMutation({ retry: false, mutationFn: previewPreexistingContract });
+
+/** P-10 / C-18: guardar la renta actual con el token de su revisión. */
+export const useCreatePreexistingContract = () =>
+  useMutation({ retry: false, mutationFn: createPreexistingContract });

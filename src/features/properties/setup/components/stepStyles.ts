@@ -80,3 +80,20 @@ export const RowText = styled.span`
     color: ${({ theme }) => theme.color.neutral600};
   }
 `;
+
+/**
+ * En celular el pie queda fijo sobre la barra de navegación, para avanzar sin bajar hasta el
+ * final de una lista larga (pedido del usuario, 14 nov.). En computadora es un pie normal.
+ */
+export const StickyStepFooter = styled(StepFooter)`
+  @media (max-width: calc(${({ theme }) => theme.breakpoint.desktop} - 0.02px)) {
+    position: sticky;
+    bottom: calc(${({ theme }) => theme.size.bottomNav} + env(safe-area-inset-bottom));
+    z-index: 1;
+    margin: 0 -16px -20px;
+    padding: 12px 16px;
+    background: ${({ theme }) => theme.color.white};
+    border-radius: 0 0 ${({ theme }) => theme.radius.panel} ${({ theme }) => theme.radius.panel};
+    box-shadow: 0 -8px 16px -12px rgba(16, 24, 40, 0.25);
+  }
+`;

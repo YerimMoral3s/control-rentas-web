@@ -2,10 +2,12 @@ import { useMutation } from '@tanstack/react-query';
 import {
   createUnit,
   createUnitsBulk,
+  deactivateUnit,
   getDashboardUnits,
   getUnit,
   getUnits,
   reviewUnit,
+  updateUnit,
   type Unit,
 } from '@api/units';
 import type { ApiSuccess } from '@api/types';
@@ -78,3 +80,9 @@ export const useCreateUnitsBulk = () => useMutation({ retry: false, mutationFn: 
 
 /** P-09: estado de hoy de una unidad durante la configuración. */
 export const useReviewUnit = () => useMutation({ retry: false, mutationFn: reviewUnit });
+
+/** U-04 / U-05 / P-15: cambiar nombre o alternar Disponible ↔ En mantenimiento. */
+export const useUpdateUnit = () => useMutation({ retry: false, mutationFn: updateUnit });
+
+/** P-15: eliminar unidad (baja lógica). */
+export const useDeactivateUnit = () => useMutation({ retry: false, mutationFn: deactivateUnit });

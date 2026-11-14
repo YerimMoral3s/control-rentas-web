@@ -10,26 +10,14 @@ import {
   type TenantInput,
 } from '@api/tenants';
 import type { ApiSuccess } from '@api/types';
-import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
+import { QueryPageSize, QueryStaleTime, useBaseQuery } from './queryBase';
 
 export const TenantsQueryKeys = {
   root: ['tenants'] as const,
-  listRoot: ['tenants', 'list'] as const,
-  list: (search: string) => [...TenantsQueryKeys.listRoot, search] as const,
   detail: (tenantId: string) => ['tenants', 'detail', tenantId] as const,
+  /** Catálogo completo: lista de Inquilinos (T-01) y selectores, con búsqueda MiniSearch. */
+  catalog: ['tenants', 'catalog'] as const,
 };
-
-/** T-01: lista de inquilinos activos. `search` ya llega con debounce. */
-export const useTenants = (search: string) =>
-  useBaseInfiniteQuery(
-    TenantsQueryKeys.list(search),
-    (page, signal) =>
-      getTenants(
-        { search: search || undefined, sort: 'name', page, page_size: QueryPageSize.standard },
-        signal,
-      ),
-    QueryStaleTime.operational,
-  );
 
 /** T-02 / T-03: un inquilino con sus ocupaciones y adeudo completo. */
 export const useTenant = (tenantId: string | undefined) =>
@@ -61,3 +49,25 @@ export const useDeactivateTenant = (
     string
   >,
 ) => useMutation({ ...options, retry: false, mutationFn: deactivateTenant });
+
+/**
+ * Catálogo de inquilinos activos (acuerdo del 14 nov.): todas las páginas de 100, por nombre, una
+ * sola vez para la lista de Inquilinos y los selectores. Vigencia operativa (30 s): al abrir una
+ * pantalla que lo usa y ya pasó ese tiempo se pide de nuevo; tras cada acción se invalida.
+ */
+export const useTenantsCatalog = () =>
+  useBaseQuery(
+    TenantsQueryKeys.catalog,
+    async (signal): Promise<ApiSuccess<Tenant[]>> => {
+      const items: Tenant[] = [];
+      for (let page = 1; ; page += 1) {
+        const response = await getTenants(
+          { sort: 'name', page, page_size: QueryPageSize.max },
+          signal,
+        );
+        items.push(...response.data);
+        if (!response.meta.pagination.has_next) return { data: items, meta: response.meta };
+      }
+    },
+    QueryStaleTime.operational,
+  );

@@ -115,3 +115,71 @@ export const getExpiringContracts = (
     signal,
     operation: 'contracts_expiring',
   });
+
+/** C-18 / P-10: datos de una renta que ya existe (contrato preexistente). */
+export type PreexistingContractInput = {
+  unit_id: string;
+  tenant_id: string;
+  contract_type: ContractType;
+  duration_months: number;
+  rent_amount: number;
+  deposit_required: boolean;
+  deposit_amount: number | null;
+  start_date: string;
+  end_date: string;
+  fixed_due_day: number;
+};
+
+type PreviewCharge = { amount: string; due_date: string; status: 'pending' | 'overdue' };
+
+/** Revisión del servidor (FR-02): estado, cobros y depósito que se crearán. FRONT no calcula. */
+export type CreationPreview = {
+  operational_date: string;
+  unit: {
+    id: string;
+    name: string;
+    property: { id: string; name: string; property_type: PropertyType };
+  };
+  tenant: { id: string; first_name: string; last_name: string };
+  contract: {
+    contract_type: ContractType;
+    duration_months: number;
+    rent_amount: string;
+    start_date: string;
+    end_date: string;
+    fixed_due_day: number;
+    status: ContractStatus;
+    is_preexisting: boolean;
+  };
+  new_rents: Array<PreviewCharge & { period_key: string }>;
+  deposit: PreviewCharge | null;
+  summary: {
+    new_rents: number;
+    new_rents_amount: string;
+    new_deposits: number;
+    new_deposits_amount: string;
+    new_payments: number;
+    new_payments_amount: string;
+  };
+  preview_token: string;
+};
+
+/** POST /v1/contracts/preexisting/preview — no crea nada. */
+export const previewPreexistingContract = (body: PreexistingContractInput) =>
+  apiRequest<CreationPreview>({
+    method: 'POST',
+    url: '/contracts/preexisting/preview',
+    data: body,
+    operation: 'contract_preexisting_preview',
+  });
+
+/** POST /v1/contracts/preexisting — confirma con el token de la revisión (409 PREVIEW_CHANGED si cambió). */
+export const createPreexistingContract = (
+  body: PreexistingContractInput & { preview_token: string },
+) =>
+  apiRequest<Contract>({
+    method: 'POST',
+    url: '/contracts/preexisting',
+    data: body,
+    operation: 'contract_preexisting_create',
+  });

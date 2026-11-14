@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoneyInput, phoneCaret, sanitizeMoney, sanitizePhone } from './numericInput';
+import {
+  formatMoneyInput,
+  maskCaret,
+  sanitizeDigits,
+  sanitizeMoney,
+  sanitizePhone,
+} from './numericInput';
 
 describe('campos numéricos', () => {
   it('el importe solo acepta dígitos y un punto con hasta 2 decimales', () => {
@@ -8,9 +14,14 @@ describe('campos numéricos', () => {
     expect(sanitizeMoney('abc')).toBe('');
   });
 
-  it('agrega separador de miles al salir del campo', () => {
+  it('agrega separador de miles mientras se escribe y respeta el máximo de la API', () => {
     expect(formatMoneyInput('8500')).toBe('8,500');
+    expect(formatMoneyInput('1,234,5678')).toBe('12,345,678');
     expect(formatMoneyInput('1234567.5')).toBe('1,234,567.5');
+    expect(formatMoneyInput('100000000000')).toBe('1,000,000,000');
+    expect(formatMoneyInput('000,000,000.56')).toBe('0.56');
+    expect(formatMoneyInput('0075')).toBe('75');
+    expect(formatMoneyInput('.5')).toBe('0.5');
     expect(formatMoneyInput('')).toBe('');
   });
 
@@ -23,7 +34,14 @@ describe('campos numéricos', () => {
   });
 
   it('deja el cursor junto al mismo dígito al aplicar la máscara', () => {
-    expect(phoneCaret('55 12 34', 3)).toBe(4);
-    expect(phoneCaret('55 12 34', 0)).toBe(0);
+    expect(maskCaret('55 12 34', 3)).toBe(4);
+    expect(maskCaret('55 12 34', 0)).toBe(0);
+    expect(maskCaret('12,345.5', 4, /[\d.]/)).toBe(5);
+  });
+
+  it('los campos de solo números no aceptan letras ni símbolos', () => {
+    expect(sanitizeDigits('1dasd')).toBe('1');
+    expect(sanitizeDigits('a1b2-3.4')).toBe('1234');
+    expect(sanitizeDigits('asdsa')).toBe('');
   });
 });

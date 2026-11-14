@@ -1,10 +1,10 @@
-import { useParams } from 'react-router';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Property } from '@api/properties';
 import {
-  Button,
+  ActionMenu,
   DetailSection,
-  Icon,
   ListFooter,
   MutedText,
   ButtonLink,
@@ -15,12 +15,15 @@ import {
   Skeleton,
   StateMessage,
   StatusBadge,
+  type ActionMenuItem,
 } from '@components';
 import { useContracts } from '@hooks/querys/contracts';
 import { useProperty } from '@hooks/querys/properties';
 import { QueryPageSize } from '@hooks/querys/queryBase';
 import { usePropertyUnits } from '@hooks/querys/units';
+import { useResultNotice } from '@lib/useResultNotice';
 import { theme as tokens } from '@styles/theme';
+import { DeletePropertyDialog } from './components/DeletePropertyDialog';
 import { Actions, Column, TwoColumns, UnitBody } from './components/UnitBody';
 import { DetailHeader, DetailPage } from './components/DetailHeader';
 import { RecentExpensesSection } from './components/RecentExpensesSection';
@@ -38,8 +41,6 @@ const Address = styled.span`
   line-height: 22px;
   color: ${({ theme }) => theme.color.neutral700};
 `;
-
-const comingSoon = { disabled: true, title: 'Disponible próximamente' } as const;
 
 /** P-02: propiedad incompleta. El avance viene del backend (unidades revisadas de su total). */
 function IncompleteNotice({ property }: { property: Property }) {
@@ -100,7 +101,13 @@ function UnitsSection({ property }: { property: Property }) {
 }
 
 /** P-04: casa o bodega. Propiedad y su única unidad en una sola pantalla. */
-function SingleUnitProperty({ property }: { property: Property }) {
+function SingleUnitProperty({
+  property,
+  propertyMenu,
+}: {
+  property: Property;
+  propertyMenu: ActionMenuItem[];
+}) {
   const units = usePropertyUnits(property.id);
   const unit = units.items[0];
 
@@ -120,7 +127,7 @@ function SingleUnitProperty({ property }: { property: Property }) {
       </DetailHeader>
       <IncompleteNotice property={property} />
       {unit ? (
-        <UnitBody unit={unit} />
+        <UnitBody unit={unit} name={property.name} menu={propertyMenu} />
       ) : (
         <MutedText>Esta propiedad aún no tiene su unidad.</MutedText>
       )}
@@ -132,6 +139,9 @@ function SingleUnitProperty({ property }: { property: Property }) {
 export function PropertyDetailPage() {
   const { propertyId } = useParams();
   const query = useProperty(propertyId);
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const { result, dismiss } = useResultNotice();
   const back = <ReturnLink to="/propiedades" label="Propiedades" />;
 
   if (query.isPending) {
@@ -162,12 +172,30 @@ export function PropertyDetailPage() {
   }
 
   const property = query.data.data;
+  // P-15: editar o eliminar la propiedad (en casa o bodega, también desde su única unidad).
+  const propertyMenu: ActionMenuItem[] = [
+    {
+      label: 'Editar propiedad',
+      onSelect: () => void navigate(`/propiedades/${property.id}/editar`),
+    },
+    { label: 'Eliminar propiedad', danger: true, onSelect: () => setDeleting(true) },
+  ];
+  const notice = result ? (
+    <Notice tone="success" title={result.title} onClose={dismiss}>
+      {result.body}
+    </Notice>
+  ) : null;
+  const deleteDialog = (
+    <DeletePropertyDialog property={property} open={deleting} onClose={() => setDeleting(false)} />
+  );
 
   if (isSingleUnit(property.property_type)) {
     return (
       <DetailPage>
         {back}
-        <SingleUnitProperty property={property} />
+        {notice}
+        <SingleUnitProperty property={property} propertyMenu={propertyMenu} />
+        {deleteDialog}
       </DetailPage>
     );
   }
@@ -186,14 +214,18 @@ export function PropertyDetailPage() {
       >
         <Address>{addressLine(property)}</Address>
       </DetailHeader>
+      {notice}
       <IncompleteNotice property={property} />
       <Actions>
-        <Button variant="secondary" icon="plus" {...comingSoon}>
+        {/* P-14: no aparece en casa ni bodega. */}
+        <ButtonLink
+          variant="secondary"
+          icon="plus"
+          to={`/propiedades/${property.id}/unidades/agregar`}
+        >
           Agregar unidades
-        </Button>
-        <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
-          <Icon name="more" size={20} />
-        </Button>
+        </ButtonLink>
+        <ActionMenu items={propertyMenu} />
       </Actions>
       <TwoColumns>
         <Column>
@@ -203,6 +235,7 @@ export function PropertyDetailPage() {
           <RecentExpensesSection propertyId={property.id} />
         </Column>
       </TwoColumns>
+      {deleteDialog}
     </DetailPage>
   );
 }
