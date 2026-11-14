@@ -4,7 +4,7 @@ import { useUnit } from '@hooks/querys/units';
 import { theme as tokens } from '@styles/theme';
 import { DetailHeader, DetailPage } from './components/DetailHeader';
 import { UnitBody } from './components/UnitBody';
-import { unitTypeLabel } from './propertyText';
+import { isSingleUnit, propertyTypeLabel, unitTypeLabel } from './propertyText';
 
 /** U-01 a U-03: detalle de unidad según su estado. */
 export function UnitDetailPage() {
@@ -49,8 +49,13 @@ export function UnitDetailPage() {
     <DetailPage>
       {back}
       <DetailHeader
-        title={unit.name}
-        subtitle={`${unit.property.name} · ${unitTypeLabel(unit.unit_type)}`}
+        // Casa o bodega: solo el nombre de la propiedad (acuerdo de 4B, FE-30).
+        title={isSingleUnit(unit.property.property_type) ? unit.property.name : unit.name}
+        subtitle={
+          isSingleUnit(unit.property.property_type)
+            ? propertyTypeLabel(unit.property.property_type)
+            : `${unit.property.name} · ${unitTypeLabel(unit.unit_type)}`
+        }
         badge={unit.status === 'inactive' ? null : <StatusBadge status={unit.status} />}
       />
       <UnitBody unit={unit} />

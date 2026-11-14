@@ -74,10 +74,15 @@ const Actions = styled.div`
 
 /** "Creamos 8 departamentos" / "Creamos la unidad Casa completa". */
 const createdText = (property: Property, units: Unit[]) => {
+  const occupied = property.unit_counts.occupied;
+  const rents =
+    occupied > 0
+      ? ` y registramos ${occupied} ${occupied === 1 ? 'renta actual' : 'rentas actuales'}`
+      : '';
   if (isSingleType(property.property_type) && units[0])
-    return `Creamos su unidad: ${units[0].name}.`;
+    return `Creamos su unidad, ${units[0].name}${rents}.`;
   const groups = unitGroups(units).map(group => groupCount(group.unit_type, group.count));
-  return groups.length > 0 ? `Creamos ${groups.join(' y ')}.` : '';
+  return groups.length > 0 ? `Creamos ${groups.join(' y ')}${rents}.` : '';
 };
 
 /** P-12: qué quedó creado y accesos. Desde H-10, Ir a Inicio es la acción principal. */

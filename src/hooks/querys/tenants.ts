@@ -17,6 +17,8 @@ export const TenantsQueryKeys = {
   listRoot: ['tenants', 'list'] as const,
   list: (search: string) => [...TenantsQueryKeys.listRoot, search] as const,
   detail: (tenantId: string) => ['tenants', 'detail', tenantId] as const,
+  /** Catálogo completo para buscar con MiniSearch (selectores). */
+  catalog: ['tenants', 'catalog'] as const,
 };
 
 /** T-01: lista de inquilinos activos. `search` ya llega con debounce. */
@@ -61,3 +63,24 @@ export const useDeactivateTenant = (
     string
   >,
 ) => useMutation({ ...options, retry: false, mutationFn: deactivateTenant });
+
+/**
+ * Catálogo de inquilinos activos (todas las páginas de 100, por nombre) para selectores con
+ * MiniSearch. Se carga al abrir su primer selector y se invalida al crear, editar o eliminar.
+ */
+export const useTenantsCatalog = () =>
+  useBaseQuery(
+    TenantsQueryKeys.catalog,
+    async (signal): Promise<ApiSuccess<Tenant[]>> => {
+      const items: Tenant[] = [];
+      for (let page = 1; ; page += 1) {
+        const response = await getTenants(
+          { sort: 'name', page, page_size: QueryPageSize.max },
+          signal,
+        );
+        items.push(...response.data);
+        if (!response.meta.pagination.has_next) return { data: items, meta: response.meta };
+      }
+    },
+    QueryStaleTime.standard,
+  );

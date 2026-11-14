@@ -12,6 +12,7 @@ import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
 import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
 import { PropertyNewPage, PropertySetupPage } from '@features/properties/setup/PropertySetupPage';
+import { CurrentRentPage } from '@features/properties/setup/currentRent/CurrentRentPage';
 import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
 import { TenantCreatePage } from '@features/tenants/TenantCreatePage';
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
       { path: 'propiedades', element: <PropertiesPage /> },
       { path: 'propiedades/nueva', element: <PropertyNewPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
+      {
+        path: 'propiedades/:propertyId/configurar/renta/:unitId',
+        element: <CurrentRentPage />,
+      },
       { path: 'propiedades/:propertyId/configurar/:step?', element: <PropertySetupPage /> },
       { path: 'contratos', element: <ContractsPage /> },
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },

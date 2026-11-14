@@ -4,10 +4,14 @@ import styled from 'styled-components';
 import { isAppError } from '@api/errors';
 import type { Property } from '@api/properties';
 import type { Unit } from '@api/units';
-import { Button, Notice } from '@components';
+import { Button, ButtonLink, Notice, StatusBadge } from '@components';
 import { useCompletePropertyConfiguration } from '@hooks/querys/properties';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
+import { contractTypeShort } from '@features/contracts/contractText';
 import { unitTypeLabel } from '@features/properties/propertyText';
+import { formatDateRange } from '@lib/dates';
+import { formatMoney } from '@lib/format';
+import { useCurrentRents } from '../currentRents';
 import { useRentedDrafts } from '@stores';
 import { media } from '@styles/theme';
 import { setupFailure, type SetupFailure } from '../setupFailure';
@@ -102,6 +106,33 @@ const UnitRow = styled.li`
   }
 `;
 
+const RentItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 0;
+
+  & + & {
+    border-top: 1px solid ${({ theme }) => theme.color.neutral200};
+  }
+
+  strong {
+    font-size: 15px;
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+  }
+
+  small {
+    font-size: 13px;
+    color: ${({ theme }) => theme.color.neutral600};
+  }
+`;
+
 const PendingItem = styled.div`
   display: flex;
   flex-direction: column;
@@ -137,6 +168,11 @@ export function ReviewStep({ property, units, onRefresh }: ReviewStepProps) {
   const [failure, setFailure] = useState<SetupFailure | null>(null);
   const [alreadyDone, setAlreadyDone] = useState(false);
   const pending = setupPending(units, rentedIds);
+  const rents = useCurrentRents(property.id);
+  const rented = units.flatMap(unit => {
+    const contract = rents.get(unit.id);
+    return contract ? [{ unit, contract }] : [];
+  });
   const hasPending = pending.unreviewed.length > 0 || pending.missingRent.length > 0;
   const states = units.map(unit => unitSetupState(unit, rentedIds));
   const count = (wanted: (typeof states)[number][]) =>
@@ -265,34 +301,59 @@ export function ReviewStep({ property, units, onRefresh }: ReviewStepProps) {
               </Rows>
             </Block>
           </Stack>
-          <Block>
-            <header>
-              <h3>
-                Pendientes
-                {hasPending ? ` · ${pending.unreviewed.length + pending.missingRent.length}` : ''}
-              </h3>
-            </header>
-            {!hasPending ? <p>Todo está revisado.</p> : null}
-            {pending.unreviewed.length > 0 ? (
-              <PendingItem>
-                <strong>{joinNames(pending.unreviewed.map(unit => unit.name))}</strong>
-                <span>Aún no {pending.unreviewed.length === 1 ? 'tiene' : 'tienen'} estado.</span>
-                <Button variant="secondary" onClick={() => go('estados')}>
-                  Revisar unidades
-                </Button>
-              </PendingItem>
+          <Stack>
+            {rented.length > 0 ? (
+              <Block>
+                <header>
+                  <h3>Rentas actuales · {rented.length}</h3>
+                  <Button variant="tertiary" onClick={() => go('estados')}>
+                    Cambiar
+                  </Button>
+                </header>
+                {rented.map(({ unit, contract }) => (
+                  <RentItem key={contract.id}>
+                    <strong>{single ? property.name : unit.name}</strong>
+                    <span>
+                      {contract.tenant.first_name} {contract.tenant.last_name}{' '}
+                      <StatusBadge status={contract.status} compact />
+                    </span>
+                    <small>
+                      {contractTypeShort(contract)} ·{' '}
+                      {formatDateRange(contract.start_date, contract.end_date)} ·{' '}
+                      {formatMoney(contract.rent_amount)} al mes
+                    </small>
+                  </RentItem>
+                ))}
+              </Block>
             ) : null}
-            {pending.missingRent.map(unit => (
-              <PendingItem key={unit.id}>
-                <strong>{unit.name}</strong>
-                <span>Está Rentada, pero falta su renta actual.</span>
-                {/* P-10 llega en la fase 4C. */}
-                <Button variant="secondary" disabled title="Disponible próximamente">
-                  Cargar renta actual
-                </Button>
-              </PendingItem>
-            ))}
-          </Block>
+            <Block>
+              <header>
+                <h3>
+                  Pendientes
+                  {hasPending ? ` · ${pending.unreviewed.length + pending.missingRent.length}` : ''}
+                </h3>
+              </header>
+              {!hasPending ? <p>Todo está revisado.</p> : null}
+              {pending.unreviewed.length > 0 ? (
+                <PendingItem>
+                  <strong>{joinNames(pending.unreviewed.map(unit => unit.name))}</strong>
+                  <span>Aún no {pending.unreviewed.length === 1 ? 'tiene' : 'tienen'} estado.</span>
+                  <Button variant="secondary" onClick={() => go('estados')}>
+                    Revisar unidades
+                  </Button>
+                </PendingItem>
+              ) : null}
+              {pending.missingRent.map(unit => (
+                <PendingItem key={unit.id}>
+                  <strong>{unit.name}</strong>
+                  <span>Está Rentada, pero falta su renta actual.</span>
+                  <ButtonLink variant="secondary" to={nav.rentPath(property.id, unit.id)}>
+                    Cargar renta actual
+                  </ButtonLink>
+                </PendingItem>
+              ))}
+            </Block>
+          </Stack>
         </Columns>
         <StepFooter>
           {hasPending ? (

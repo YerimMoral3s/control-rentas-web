@@ -1,4 +1,5 @@
 import type { ContractStatus } from './contracts';
+import type { PropertyType } from './properties';
 import { apiRequest } from './http';
 import type { PaginatedMeta } from './types';
 
@@ -13,7 +14,8 @@ export type UnitSummary = {
   name: string;
   status: UnitStatus;
   current_contract: { id: string; status: ContractStatus } | null;
-  property: { id: string; name: string };
+  /** FE-30: el tipo permite mostrar casa y bodega solo con el nombre de la propiedad. */
+  property: { id: string; name: string; property_type: PropertyType };
 };
 
 /** GET /v1/units con scope=dashboard: unidades revisadas de propiedades completas, por estado. */

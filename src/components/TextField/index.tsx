@@ -5,7 +5,7 @@ import {
   type FocusEvent,
   type ReactNode,
 } from 'react';
-import { formatMoneyInput, phoneCaret, sanitizeMoney, sanitizePhone } from '@lib/numericInput';
+import { formatMoneyInput, maskCaret, sanitizePhone } from '@lib/numericInput';
 import { Icon } from '../Icon';
 import {
   Control,
@@ -33,7 +33,6 @@ type TextFieldProps = Omit<ComponentPropsWithRef<'input'>, 'prefix'> & {
   format?: 'money' | 'phone';
 };
 
-const SANITIZERS = { money: sanitizeMoney, phone: sanitizePhone } as const;
 const INPUT_MODES = { money: 'decimal', phone: 'tel' } as const;
 
 /**
@@ -63,26 +62,25 @@ export function TextField({
   // Se limpia el valor del propio input antes de avisar al formulario (funciona también con react-hook-form).
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
+    const caret = input.selectionStart ?? input.value.length;
+    const before = input.value;
     if (format === 'phone') {
       // La máscara agrega espacios; el cursor se queda junto al mismo dígito.
-      const caret = input.selectionStart ?? input.value.length;
       const pasted = (event.nativeEvent as InputEvent).inputType === 'insertFromPaste';
-      const before = input.value;
       input.value = sanitizePhone(before, pasted);
       const stripped = before.replace(/\D/g, '').length - input.value.replace(/\D/g, '').length;
       const digitsBefore =
         before.slice(0, caret).replace(/\D/g, '').length - (pasted ? stripped : 0);
-      const position = phoneCaret(input.value, Math.min(digitsBefore, 10));
+      const position = maskCaret(input.value, Math.min(digitsBefore, 10));
       input.setSelectionRange(position, position);
-    } else if (format) {
-      input.value = SANITIZERS[format](input.value);
+    } else if (format === 'money') {
+      // Separador de miles mientras se escribe; el cursor sigue junto al mismo dígito.
+      input.value = formatMoneyInput(before);
+      const usefulBefore = before.slice(0, caret).replace(/[^\d.]/g, '').length;
+      const position = maskCaret(input.value, usefulBefore, /[\d.]/);
+      input.setSelectionRange(position, position);
     }
     onChange?.(event);
-  };
-
-  const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
-    if (format === 'money') event.currentTarget.value = sanitizeMoney(event.currentTarget.value);
-    onFocus?.(event);
   };
 
   const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
@@ -101,7 +99,7 @@ export function TextField({
           id={inputId}
           readOnly={readOnly}
           onChange={handleChange}
-          onFocus={handleFocus}
+          onFocus={onFocus}
           onBlur={handleBlur}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}

@@ -16,6 +16,7 @@ import { useExpiringContracts } from '@hooks/querys/contracts';
 import { useDashboardUnits } from '@hooks/querys/units';
 import { formatShortDate } from '@lib/dates';
 import { placeName } from '@lib/place';
+import { isSingleUnit } from '@features/properties/propertyText';
 import { useMediaQuery } from '@lib/useMediaQuery';
 import { media, theme as tokens } from '@styles/theme';
 import { SectionError } from './SectionError';
@@ -295,8 +296,15 @@ function UnitItems({ status }: { status: 'available' | 'maintenance' }) {
         {query.items.map(unit => (
           <li key={unit.id}>
             <ItemLink to={`/unidades/${unit.id}`} state={FROM_LIST_STATE}>
-              <strong>{unit.name}</strong>
-              <ItemSub>{unit.property.name}</ItemSub>
+              {/* Casa o bodega: solo la propiedad (FE-30); el resto, unidad y su propiedad. */}
+              {isSingleUnit(unit.property.property_type) ? (
+                <strong>{unit.property.name}</strong>
+              ) : (
+                <>
+                  <strong>{unit.name}</strong>
+                  <ItemSub>{unit.property.name}</ItemSub>
+                </>
+              )}
               <ItemSide>
                 <Icon name="chevronRight" size={18} strokeWidth={2.4} />
               </ItemSide>
@@ -345,9 +353,7 @@ function SingleUnitLink({ status }: { status: 'available' | 'maintenance' }) {
   if (!unit) return null;
   return (
     <>
-      <span>
-        {unit.property.name} / {unit.name}
-      </span>
+      <span>{placeName(unit.name, unit.property)}</span>
       <RowActionLink to={`/unidades/${unit.id}`}>Ver unidad</RowActionLink>
     </>
   );

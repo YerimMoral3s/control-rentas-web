@@ -120,7 +120,8 @@ export const unitGroups = (units: Pick<Unit, 'name' | 'unit_type'>[]) => {
 };
 
 /**
- * Estado de hoy en P-09. `rented`: marcada Rentada aquí y espera su renta actual (P-10).
+ * Estado de hoy en P-09. `rented`: marcada Rentada aquí y espera su renta actual (P-10);
+ * `occupied`: ya tiene su renta actual.
  * `pending`: recién creada, sin revisar.
  */
 export type UnitSetupState = 'pending' | 'available' | 'maintenance' | 'rented' | 'occupied';
@@ -129,7 +130,8 @@ export const unitSetupState = (
   unit: Pick<Unit, 'id' | 'status' | 'reviewed_at'>,
   rentedIds: string[],
 ): UnitSetupState => {
-  if (unit.status === 'occupied') return 'occupied';
+  // Con su renta actual ya guardada. Si aún no se confirmó su estado, sigue pendiente de revisar.
+  if (unit.status === 'occupied') return unit.reviewed_at ? 'occupied' : 'pending';
   if (rentedIds.includes(unit.id)) return 'rented';
   if (!unit.reviewed_at) return 'pending';
   return unit.status === 'maintenance' ? 'maintenance' : 'available';

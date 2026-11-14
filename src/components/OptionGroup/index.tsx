@@ -15,6 +15,8 @@ const Options = styled.div`
 `;
 
 const Option = styled.label<{ $selected: boolean }>`
+  /* Contiene el radio oculto (posición absoluta) para que no mueva el scroll de la página. */
+  position: relative;
   flex: 1;
   min-height: ${({ theme }) => theme.size.touch};
   display: flex;

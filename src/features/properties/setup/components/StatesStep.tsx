@@ -2,11 +2,13 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import type { Property } from '@api/properties';
 import type { Unit } from '@api/units';
-import { Button, Dialog, DialogActions, Notice, OptionGroup } from '@components';
+import { Button, ButtonLink, Dialog, DialogActions, Notice, OptionGroup } from '@components';
 import { useReviewUnit } from '@hooks/querys/units';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
 import { unitTypeLabel } from '@features/properties/propertyText';
 import { useMediaQuery } from '@lib/useMediaQuery';
+import { useResultNotice } from '@lib/useResultNotice';
+import { currentRentLine, useCurrentRents } from '../currentRents';
 import { useRentedDrafts } from '@stores';
 import { media, theme as tokens } from '@styles/theme';
 import { setupFailure, type SetupFailure } from '../setupFailure';
@@ -82,19 +84,34 @@ const Tag = styled.span<{ $state: UnitSetupState }>`
   }
 `;
 
+/** Acciones de la fila; en computadora, a la derecha y separadas de los estados. */
 const Extra = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: ${({ theme }) => theme.color.warning};
-    font-weight: 700;
+  &:empty {
+    display: none;
   }
+
+  ${media.wide} {
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+`;
+
+const Missing = styled.small`
+  && {
+    font-size: 13px;
+    font-weight: 700;
+    color: ${({ theme }) => theme.color.warning};
+  }
+`;
+
+const CurrentRent = styled.small`
+  font-size: 13px;
+  color: ${({ theme }) => theme.color.neutral700};
 `;
 
 const SheetOptions = styled.div`
@@ -104,6 +121,7 @@ const SheetOptions = styled.div`
 `;
 
 const SheetOption = styled.label<{ $selected: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -153,13 +171,37 @@ export function StatesStep({ property, units }: StatesStepProps) {
   const [failure, setFailure] = useState<{ unitId: string; detail: SetupFailure } | null>(null);
   const [sheet, setSheet] = useState<{ unit: Unit; choice: Choice | undefined } | null>(null);
   const pending = setupPending(units, rentedIds);
+  const rents = useCurrentRents(property.id);
+  const { result, dismiss } = useResultNotice();
   // Casa o bodega: el nombre de su unidad ya dice el tipo.
   const single = isSingleType(property.property_type);
   const sentence = pendingSentence(pending);
 
+  /** Escritura de estado de hoy; el aviso queda junto a la unidad si falla. */
+  const sendReview = async (unit: Unit, status: 'available' | 'maintenance' | 'occupied') => {
+    setSavingId(unit.id);
+    try {
+      await review.mutateAsync({ unitId: unit.id, status });
+      await events.unitsChanged(property.id);
+      return true;
+    } catch (error) {
+      setFailure({
+        unitId: unit.id,
+        detail: setupFailure(error, `No guardamos el estado de ${unit.name}.`),
+      });
+      return false;
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   const choose = async (unit: Unit, choice: Choice) => {
     setFailure(null);
     if (choice === 'rented') {
+      // Ya tiene su renta actual: solo falta confirmar que está Rentada.
+      if (unit.status === 'occupied') return void (await sendReview(unit, 'occupied'));
+      // La renta actual solo se carga en una unidad que no está En mantenimiento.
+      if (unit.status === 'maintenance' && !(await sendReview(unit, 'available'))) return;
       markRented(unit.id);
       return;
     }
@@ -168,19 +210,7 @@ export function StatesStep({ property, units }: StatesStepProps) {
       unmarkRented(unit.id);
       return;
     }
-    setSavingId(unit.id);
-    try {
-      await review.mutateAsync({ unitId: unit.id, status: choice });
-      unmarkRented(unit.id);
-      await events.unitsChanged(property.id);
-    } catch (error) {
-      setFailure({
-        unitId: unit.id,
-        detail: setupFailure(error, `No guardamos el estado de ${unit.name}.`),
-      });
-    } finally {
-      setSavingId(null);
-    }
+    if (await sendReview(unit, choice)) unmarkRented(unit.id);
   };
 
   const goReview = () => nav.goToStep(property.id, 'revisar');
@@ -201,6 +231,11 @@ export function StatesStep({ property, units }: StatesStepProps) {
       onSaveExit={nav.exit}
     >
       <StepPanel>
+        {result ? (
+          <Notice tone="success" title={result.title} onClose={dismiss}>
+            {result.body}
+          </Notice>
+        ) : null}
         <StepIntro>
           <h2>Revisa tus unidades</h2>
           <p>Elige cómo está cada una hoy.{sentence ? ` ${sentence}` : ''}</p>
@@ -219,6 +254,7 @@ export function StatesStep({ property, units }: StatesStepProps) {
                         {unitTypeLabel(unit.unit_type).replace(/^./, c => c.toUpperCase())}
                       </small>
                     )}
+                    {state === 'rented' ? <Missing>Falta: cargar su renta actual</Missing> : null}
                   </RowText>
                   {!isDesktop || state === 'pending' || state === 'occupied' ? (
                     <Tag $state={state}>{UNIT_SETUP_LABEL[state]}</Tag>
@@ -226,7 +262,7 @@ export function StatesStep({ property, units }: StatesStepProps) {
                 </RowHead>
                 <div>
                   {state === 'occupied' ? (
-                    <small>Ya tiene su renta actual.</small>
+                    <CurrentRent>{currentRentLine(rents.get(unit.id))}</CurrentRent>
                   ) : isDesktop ? (
                     <OptionGroup
                       label={`Estado de ${unit.name}`}
@@ -237,12 +273,10 @@ export function StatesStep({ property, units }: StatesStepProps) {
                     />
                   ) : null}
                   <Extra>
-                    {state === 'rented' ? <p>Falta: cargar su renta actual</p> : null}
                     {state === 'rented' ? (
-                      // P-10 llega en la fase 4C.
-                      <Button variant="secondary" disabled title="Disponible próximamente">
+                      <ButtonLink variant="secondary" to={nav.rentPath(property.id, unit.id)}>
                         Cargar renta actual
-                      </Button>
+                      </ButtonLink>
                     ) : null}
                     {!isDesktop && state !== 'occupied' ? (
                       <Button

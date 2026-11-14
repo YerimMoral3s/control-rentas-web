@@ -18,7 +18,7 @@ export const useInvalidateEvents = () => {
 
   return {
     /** Inquilino nuevo: aparece en la lista y en búsquedas. */
-    tenantCreated: () => invalidate([TenantsQueryKeys.listRoot]),
+    tenantCreated: () => invalidate([TenantsQueryKeys.listRoot, TenantsQueryKeys.catalog]),
     /** Nombre o teléfono cambiaron: se muestran también en contratos, cobros y movimientos. */
     tenantUpdated: (tenantId: string) =>
       invalidate([
@@ -32,6 +32,7 @@ export const useInvalidateEvents = () => {
     tenantDeactivated: (tenantId: string) =>
       invalidate([
         TenantsQueryKeys.listRoot,
+        TenantsQueryKeys.catalog,
         TenantsQueryKeys.detail(tenantId),
         DashboardQueryKeys.root,
       ]),
@@ -50,6 +51,21 @@ export const useInvalidateEvents = () => {
     /** Propiedad eliminada: sale de Propiedades, de Inicio y de las búsquedas. */
     propertyDeactivated: () =>
       invalidate([PropertiesQueryKeys.root, UnitsQueryKeys.root, DashboardQueryKeys.root]),
+    /**
+     * Renta actual guardada (P-10): contrato, cobros y depósito nuevos; la unidad queda Ocupada y
+     * el inquilino tiene una ocupación más.
+     */
+    preexistingContractCreated: (tenantId: string) =>
+      invalidate([
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        UnitsQueryKeys.root,
+        PropertiesQueryKeys.root,
+        TenantsQueryKeys.detail(tenantId),
+        TenantsQueryKeys.listRoot,
+        TenantsQueryKeys.catalog,
+        DashboardQueryKeys.root,
+      ]),
     /** Configuración completa: la propiedad y sus unidades entran a Inicio. */
     propertyCompleted: (propertyId: string) =>
       invalidate([

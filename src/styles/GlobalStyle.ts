@@ -32,6 +32,18 @@ export const GlobalStyle = createGlobalStyle`
     outline-offset: 2px;
   }
 
+  /*
+   * Títulos (pedido del usuario, 14 nov.): líneas equilibradas para que no quede una palabra o
+   * número sola ("Renta actual de / Departamento 2") y sin cortar palabras a la mitad; solo se
+   * parte una palabra que por sí sola no cabe.
+   */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+
   .visually-hidden {
     position: absolute !important;
     width: 1px; height: 1px;

@@ -105,3 +105,21 @@ export const monthRange = (month: string, offset = 0) => {
     label: `${name.charAt(0).toUpperCase()}${name.slice(1)} ${first.getUTCFullYear()}`,
   };
 };
+
+/**
+ * Fin de un contrato que ya existe (C-18): inicio + duración − 1 día, con la misma regla que BACK
+ * (`calculateEndDate`: el día se acota al último del mes destino). `POST /contracts/preexisting`
+ * exige `end_date` y la revisión del servidor lo valida (FE-31).
+ */
+export const contractEndDate = (start: string, months: number) => {
+  const [year, month, day] = start.split('-').map(Number) as [number, number, number];
+  const target = new Date(Date.UTC(year, month - 1 + months, 1));
+  const lastDay = new Date(
+    Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  const end = new Date(
+    Date.UTC(target.getUTCFullYear(), target.getUTCMonth(), Math.min(day, lastDay)),
+  );
+  end.setUTCDate(end.getUTCDate() - 1);
+  return end.toISOString().slice(0, 10);
+};
