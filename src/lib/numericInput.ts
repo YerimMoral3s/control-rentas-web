@@ -27,6 +27,9 @@ export const formatMoneyInput = (value: string): string => {
   return decimals === undefined ? grouped : `${grouped}.${decimals}`;
 };
 
+/** Solo dígitos (cantidades, números iniciales, código postal, día de pago). */
+export const sanitizeDigits = (value: string): string => value.replace(/\D/g, '');
+
 const phoneDigits = (value: string, pasted: boolean) => {
   const digits = value.replace(/\D/g, '');
   // Al pegar "+52 55…" o "52 55…" se quita la lada del país (FE-28: solo México).

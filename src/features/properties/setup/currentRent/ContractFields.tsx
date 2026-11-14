@@ -169,7 +169,7 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
         <TextField
           label="Día de pago"
           help="Día del mes en que vence la renta"
-          inputMode="numeric"
+          format="digits"
           maxLength={2}
           autoComplete="off"
           disabled={reviewing}

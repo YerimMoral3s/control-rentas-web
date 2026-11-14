@@ -5,7 +5,7 @@ import {
   type FocusEvent,
   type ReactNode,
 } from 'react';
-import { formatMoneyInput, maskCaret, sanitizePhone } from '@lib/numericInput';
+import { formatMoneyInput, maskCaret, sanitizeDigits, sanitizePhone } from '@lib/numericInput';
 import { Icon } from '../Icon';
 import {
   Control,
@@ -29,11 +29,12 @@ type TextFieldProps = Omit<ComponentPropsWithRef<'input'>, 'prefix'> & {
   /**
    * money: solo dígitos y punto (2 decimales), con separador de miles al salir del campo.
    * phone: teléfono de México, máximo 10 dígitos con máscara "55 12 34 56 78".
+   * digits: solo números (cantidad, número inicial, código postal, día); el largo, con maxLength.
    */
-  format?: 'money' | 'phone';
+  format?: 'money' | 'phone' | 'digits';
 };
 
-const INPUT_MODES = { money: 'decimal', phone: 'tel' } as const;
+const INPUT_MODES = { money: 'decimal', phone: 'tel', digits: 'numeric' } as const;
 
 /**
  * Campo de F-03. La etiqueta siempre visible; ayuda y error debajo.
@@ -73,6 +74,11 @@ export function TextField({
         before.slice(0, caret).replace(/\D/g, '').length - (pasted ? stripped : 0);
       const position = maskCaret(input.value, Math.min(digitsBefore, 10));
       input.setSelectionRange(position, position);
+    } else if (format === 'digits') {
+      // Letras y símbolos no entran (también al pegar); el cursor se queda junto al mismo dígito.
+      const digitsBefore = before.slice(0, caret).replace(/\D/g, '').length;
+      input.value = sanitizeDigits(before);
+      input.setSelectionRange(digitsBefore, digitsBefore);
     } else if (format === 'money') {
       // Separador de miles mientras se escribe; el cursor sigue junto al mismo dígito.
       input.value = formatMoneyInput(before);

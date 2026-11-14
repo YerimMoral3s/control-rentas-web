@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoneyInput, maskCaret, sanitizeMoney, sanitizePhone } from './numericInput';
+import {
+  formatMoneyInput,
+  maskCaret,
+  sanitizeDigits,
+  sanitizeMoney,
+  sanitizePhone,
+} from './numericInput';
 
 describe('campos numéricos', () => {
   it('el importe solo acepta dígitos y un punto con hasta 2 decimales', () => {
@@ -31,5 +37,11 @@ describe('campos numéricos', () => {
     expect(maskCaret('55 12 34', 3)).toBe(4);
     expect(maskCaret('55 12 34', 0)).toBe(0);
     expect(maskCaret('12,345.5', 4, /[\d.]/)).toBe(5);
+  });
+
+  it('los campos de solo números no aceptan letras ni símbolos', () => {
+    expect(sanitizeDigits('1dasd')).toBe('1');
+    expect(sanitizeDigits('a1b2-3.4')).toBe('1234');
+    expect(sanitizeDigits('asdsa')).toBe('');
   });
 });

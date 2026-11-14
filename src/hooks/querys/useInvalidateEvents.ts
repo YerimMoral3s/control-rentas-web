@@ -64,6 +64,23 @@ export const useInvalidateEvents = () => {
         TenantsQueryKeys.catalog,
         DashboardQueryKeys.root,
       ]),
+    /**
+     * Unidad editada, enviada a mantenimiento, disponible o eliminada: cambia su detalle, la
+     * propiedad (conteos, avance) e Inicio (disponibles y en mantenimiento).
+     */
+    unitChanged: () =>
+      invalidate([UnitsQueryKeys.root, PropertiesQueryKeys.root, DashboardQueryKeys.root]),
+    /** Nombre de unidad o propiedad corregido (P-15): se muestra en contratos, cobros e inquilinos. */
+    placeRenamed: () =>
+      invalidate([
+        UnitsQueryKeys.root,
+        PropertiesQueryKeys.root,
+        DashboardQueryKeys.root,
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        MovementsQueryKeys.root,
+        TenantsQueryKeys.root,
+      ]),
     /** Configuración completa: la propiedad y sus unidades entran a Inicio. */
     propertyCompleted: (propertyId: string) =>
       invalidate([

@@ -13,6 +13,9 @@ import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
 import { PropertyNewPage, PropertySetupPage } from '@features/properties/setup/PropertySetupPage';
 import { CurrentRentPage } from '@features/properties/setup/currentRent/CurrentRentPage';
+import { AddUnitsPage } from '@features/properties/edit/AddUnitsPage';
+import { PropertyEditPage } from '@features/properties/edit/PropertyEditPage';
+import { UnitEditPage } from '@features/properties/edit/UnitEditPage';
 import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
 import { TenantCreatePage } from '@features/tenants/TenantCreatePage';
@@ -50,6 +53,8 @@ export const router = createBrowserRouter([
       { path: 'propiedades', element: <PropertiesPage /> },
       { path: 'propiedades/nueva', element: <PropertyNewPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
+      { path: 'propiedades/:propertyId/editar', element: <PropertyEditPage /> },
+      { path: 'propiedades/:propertyId/unidades/agregar', element: <AddUnitsPage /> },
       {
         path: 'propiedades/:propertyId/configurar/renta/:unitId',
         element: <CurrentRentPage />,
@@ -59,6 +64,7 @@ export const router = createBrowserRouter([
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },
       { path: 'contratos/:contractId', element: <ContractDetailPage /> },
       { path: 'unidades/:unitId', element: <UnitDetailPage /> },
+      { path: 'unidades/:unitId/editar', element: <UnitEditPage /> },
       { path: 'mas', element: <MorePage /> },
       ...devRoutes,
       { path: '*', element: <PendingScreen title="No encontramos esta página" /> },

@@ -1,11 +1,12 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import type { Contract } from '@api/contracts';
 import type { Unit } from '@api/units';
 import {
   ActionLink,
+  ActionMenu,
   Button,
   DetailSection,
-  Icon,
   ListFooter,
   MutedText,
   Notice,
@@ -13,6 +14,7 @@ import {
   SectionError,
   Skeleton,
   StatusBadge,
+  type ActionMenuItem,
 } from '@components';
 import { useContracts } from '@hooks/querys/contracts';
 import { formatDateRange, formatDateWithYear } from '@lib/dates';
@@ -20,6 +22,7 @@ import { formatMoney, formatPhone } from '@lib/format';
 import { media, theme as tokens } from '@styles/theme';
 import { contractTypeLabel, fullName } from '@features/tenants/tenantText';
 import { ExpensesSection } from './ExpensesSection';
+import { UnitStatusDialog } from './UnitStatusDialog';
 
 /** Celular: una columna. Computadora ancha: contenido a la izquierda y gastos a la derecha. */
 export const TwoColumns = styled.div`
@@ -126,13 +129,31 @@ const History = styled.ul`
   }
 `;
 
-const comingSoon = { disabled: true, title: 'Disponible próximamente' } as const;
-
-/** Aviso del estado (U-02 vencido, U-03 mantenimiento) y acciones válidas, deshabilitadas hasta su fase. */
-export function UnitStatusArea({ unit, current }: { unit: Unit; current: Contract | undefined }) {
+/**
+ * Aviso del estado (U-02 vencido, U-03 mantenimiento) y acciones válidas: Enviar a mantenimiento
+ * (U-04), Marcar como disponible (U-05) y Más acciones. Crear contrato llega en la fase 5.
+ */
+export function UnitStatusArea({
+  unit,
+  current,
+  name,
+  menu,
+}: {
+  unit: Unit;
+  current: Contract | undefined;
+  name: string;
+  menu: ActionMenuItem[];
+}) {
+  const [target, setTarget] = useState<'maintenance' | 'available' | null>(null);
+  const [result, setResult] = useState<{ title: string; body: string } | null>(null);
   return (
     <>
-      {unit.status === 'maintenance' ? (
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={() => setResult(null)}>
+          {result.body}
+        </Notice>
+      ) : null}
+      {unit.status === 'maintenance' && !result ? (
         <Notice tone="warning" title="No se puede rentar mientras esté en mantenimiento.">
           {unit.description ?? 'Cuando termine el arreglo, márcala como disponible.'}
         </Notice>
@@ -142,8 +163,7 @@ export function UnitStatusArea({ unit, current }: { unit: Unit; current: Contrac
           tone="warning"
           title={`El contrato venció el ${formatDateWithYear(current.end_date)}.`}
         >
-          {fullName(current.tenant)} sigue en {unit.name} hasta que continúes o termines el
-          contrato.
+          {fullName(current.tenant)} sigue en {name} hasta que continúes o termines el contrato.
         </Notice>
       ) : null}
       {unit.reviewed_at === null ? (
@@ -154,19 +174,26 @@ export function UnitStatusArea({ unit, current }: { unit: Unit; current: Contrac
       <Actions>
         {unit.status === 'available' && unit.reviewed_at !== null ? (
           <>
-            <Button {...comingSoon}>Crear contrato</Button>
-            <Button variant="secondary" {...comingSoon}>
+            <Button disabled title="Disponible próximamente">
+              Crear contrato
+            </Button>
+            <Button variant="secondary" onClick={() => setTarget('maintenance')}>
               Enviar a mantenimiento
             </Button>
           </>
         ) : null}
         {unit.status === 'maintenance' ? (
-          <Button {...comingSoon}>Marcar como disponible</Button>
+          <Button onClick={() => setTarget('available')}>Marcar como disponible</Button>
         ) : null}
-        <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
-          <Icon name="more" size={20} />
-        </Button>
+        <ActionMenu items={menu} />
       </Actions>
+      <UnitStatusDialog
+        unit={unit}
+        name={name}
+        target={target}
+        onClose={() => setTarget(null)}
+        onDone={setResult}
+      />
     </>
   );
 }
@@ -247,14 +274,23 @@ export const useCurrentContract = (unit: Unit | undefined) => {
 };
 
 /** Cuerpo del detalle de unidad (U-01 a U-03) y de casa o bodega (P-04). */
-export function UnitBody({ unit }: { unit: Unit }) {
+export function UnitBody({
+  unit,
+  name,
+  menu,
+}: {
+  unit: Unit;
+  /** Como se muestra la unidad (casa o bodega: el nombre de la propiedad). */
+  name: string;
+  menu: ActionMenuItem[];
+}) {
   const { query, contract } = useCurrentContract(unit);
   const occupied = Boolean(unit.current_contract);
 
   return (
     <TwoColumns>
       <Column>
-        <UnitStatusArea unit={unit} current={contract} />
+        <UnitStatusArea unit={unit} current={contract} name={name} menu={menu} />
         {occupied ? (
           query.isPending ? (
             <Skeleton $height="140px" $radius={tokens.radius.card} />
