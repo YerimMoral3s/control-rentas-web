@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { placeName, placeParts } from './place';
 
 describe('lugar según tipo de propiedad', () => {
-  it('casa y bodega: unidad primero', () => {
-    expect(placeName('Casa 1', { name: 'Casa Encino', property_type: 'house' })).toBe(
-      'Casa 1 · Casa Encino',
+  it('casa y bodega: solo el nombre de la propiedad', () => {
+    expect(placeName('Casa completa', { name: 'Casa Encino', property_type: 'house' })).toBe(
+      'Casa Encino',
     );
     expect(
-      placeParts('Bodega 1', { name: 'Bodega Poniente', property_type: 'warehouse' }).primary,
-    ).toBe('Bodega 1');
+      placeParts('Bodega', { name: 'Bodega Poniente', property_type: 'warehouse' }).primary,
+    ).toBe('Bodega Poniente');
   });
 
   it('edificio, plaza, mixta o sin tipo: propiedad / unidad', () => {

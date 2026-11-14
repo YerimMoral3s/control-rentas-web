@@ -1,11 +1,17 @@
 import { Link, useLocation, useNavigate } from 'react-router';
 import { Icon } from '../Icon';
 import styled, { css } from 'styled-components';
+import { media } from '@styles/theme';
 
 /** Acción terciaria de F-02 como enlace: "Ver detalle", "Ver contrato", "WhatsApp". */
 export const actionLinkStyle = css`
   min-height: ${({ theme }) => theme.size.touch};
   padding: 0 10px;
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   display: inline-flex;
   align-items: center;
   justify-content: center;

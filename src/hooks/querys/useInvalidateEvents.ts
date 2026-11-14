@@ -3,7 +3,9 @@ import { ContractsQueryKeys } from './contracts';
 import { DashboardQueryKeys } from './dashboard';
 import { MovementsQueryKeys } from './movements';
 import { PaymentsQueryKeys } from './payments';
+import { PropertiesQueryKeys } from './properties';
 import { TenantsQueryKeys } from './tenants';
+import { UnitsQueryKeys } from './units';
 
 /**
  * Un evento por acción de dominio (patrón appv2). Cada uno invalida solo las consultas que esa
@@ -31,6 +33,29 @@ export const useInvalidateEvents = () => {
       invalidate([
         TenantsQueryKeys.listRoot,
         TenantsQueryKeys.detail(tenantId),
+        DashboardQueryKeys.root,
+      ]),
+    /** Propiedad nueva (incompleta): aparece primero en Propiedades. */
+    propertyCreated: () => invalidate([PropertiesQueryKeys.root]),
+    /** Nombre, ubicación o tipo cambiaron: también se ven en Inicio y en sus unidades. */
+    propertyUpdated: (propertyId: string) =>
+      invalidate([
+        PropertiesQueryKeys.root,
+        UnitsQueryKeys.byProperty(propertyId),
+        DashboardQueryKeys.root,
+      ]),
+    /** Unidades nuevas o revisadas: cambia el avance de la configuración de su propiedad. */
+    unitsChanged: (propertyId: string) =>
+      invalidate([PropertiesQueryKeys.root, UnitsQueryKeys.byProperty(propertyId)]),
+    /** Propiedad eliminada: sale de Propiedades, de Inicio y de las búsquedas. */
+    propertyDeactivated: () =>
+      invalidate([PropertiesQueryKeys.root, UnitsQueryKeys.root, DashboardQueryKeys.root]),
+    /** Configuración completa: la propiedad y sus unidades entran a Inicio. */
+    propertyCompleted: (propertyId: string) =>
+      invalidate([
+        PropertiesQueryKeys.detail(propertyId),
+        PropertiesQueryKeys.root,
+        UnitsQueryKeys.root,
         DashboardQueryKeys.root,
       ]),
   };

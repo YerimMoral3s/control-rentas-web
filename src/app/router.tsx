@@ -11,6 +11,7 @@ import { MovementsPage } from '@features/movements/MovementsPage';
 import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
 import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
+import { PropertyNewPage, PropertySetupPage } from '@features/properties/setup/PropertySetupPage';
 import { UnitDetailPage } from '@features/properties/UnitDetailPage';
 import { TenantDetailPage } from '@features/tenants/TenantDetailPage';
 import { TenantCreatePage } from '@features/tenants/TenantCreatePage';
@@ -46,7 +47,9 @@ export const router = createBrowserRouter([
       { path: 'movimientos', element: <MovementsPage /> },
       { path: 'gastos/:expenseId', element: <ExpenseDetailPage /> },
       { path: 'propiedades', element: <PropertiesPage /> },
+      { path: 'propiedades/nueva', element: <PropertyNewPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
+      { path: 'propiedades/:propertyId/configurar/:step?', element: <PropertySetupPage /> },
       { path: 'contratos', element: <ContractsPage /> },
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },
       { path: 'contratos/:contractId', element: <ContractDetailPage /> },

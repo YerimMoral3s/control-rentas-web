@@ -146,6 +146,24 @@ export const StyledButton = styled.button<{ $variant: ButtonVariant; $fullWidth:
   }
 
   ${({ $variant }) => variants[$variant]}
+
+  /*
+   * Teléfono y tableta (acuerdo del 13 nov.): todos los botones más compactos. En computadora
+   * ancha conservan las medidas de F-02.
+   */
+  @media (max-width: calc(${({ theme }) => theme.breakpoint.wide} - 0.02px)) {
+    height: 40px;
+    min-width: 40px;
+    gap: 6px;
+    padding: 0
+      ${({ $variant }) => ($variant === 'tertiary' || $variant === 'dangerTertiary' ? '8px' : '12px')};
+    font-size: 15px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
 `;
 
 export const Spinner = styled.span`

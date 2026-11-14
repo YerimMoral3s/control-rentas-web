@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { media } from '@styles/theme';
 
 export const FieldRoot = styled.div`
   display: flex;
@@ -39,6 +40,11 @@ export const Control = styled.div<{ $invalid?: boolean; $readOnly?: boolean }>`
   align-items: center;
   gap: 8px;
   min-height: ${({ theme }) => theme.size.field};
+
+  ${media.compact} {
+    min-height: 40px;
+  }
+
   padding: 0 14px;
   border: 1px solid ${({ theme }) => theme.color.neutral300};
   border-radius: ${({ theme }) => theme.radius.control};
@@ -77,6 +83,11 @@ export const Input = styled.input`
   flex: 1;
   min-width: 0;
   height: 44px;
+
+  ${media.compact} {
+    height: 38px;
+  }
+
   border: 0;
   padding: 0;
   background: transparent;

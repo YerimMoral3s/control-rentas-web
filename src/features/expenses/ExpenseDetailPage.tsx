@@ -16,7 +16,7 @@ import { formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { expenseTypeLabel } from '@lib/labels';
 import { placeName } from '@lib/place';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 
 const Page = styled.div`
   width: 100%;
@@ -33,8 +33,7 @@ const Header = styled.header`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 
   span {

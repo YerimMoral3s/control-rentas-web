@@ -1,4 +1,13 @@
-import { getProperties, getProperty, type Property } from '@api/properties';
+import { useMutation } from '@tanstack/react-query';
+import {
+  completePropertyConfiguration,
+  createProperty,
+  deactivateProperty,
+  getProperties,
+  getProperty,
+  updateProperty,
+  type Property,
+} from '@api/properties';
 import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
 
 export const PropertiesQueryKeys = {
@@ -32,3 +41,17 @@ export const useProperty = (propertyId: string | undefined) =>
     QueryStaleTime.operational,
     { enabled: Boolean(propertyId) },
   );
+
+/** P-05 / P-06: crear la propiedad (queda incompleta). Nunca se reintenta solo. */
+export const useCreateProperty = () => useMutation({ retry: false, mutationFn: createProperty });
+
+/** P-06: corregir datos o tipo durante la configuración. */
+export const useUpdateProperty = () => useMutation({ retry: false, mutationFn: updateProperty });
+
+/** P-11: completar configuración; desde aquí aparece en Inicio. */
+export const useCompletePropertyConfiguration = () =>
+  useMutation({ retry: false, mutationFn: completePropertyConfiguration });
+
+/** Eliminar propiedad (baja lógica, P-15). */
+export const useDeactivateProperty = () =>
+  useMutation({ retry: false, mutationFn: deactivateProperty });

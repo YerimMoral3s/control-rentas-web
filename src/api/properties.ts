@@ -64,3 +64,57 @@ export const getProperty = (propertyId: string, signal?: AbortSignal) =>
     signal,
     operation: 'property_detail',
   });
+
+/** Datos de P-06 (FE-03): nombre y código postal obligatorios; el resto, opcional. */
+export type PropertyInput = {
+  name: string;
+  property_type: PropertyType;
+  postal_code: string;
+  street: string | null;
+  external_number: string | null;
+  internal_number: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  reference_notes: string | null;
+};
+
+/** POST /v1/properties — crea la propiedad incompleta y sin unidades. */
+export const createProperty = (body: PropertyInput) =>
+  apiRequest<Property>({
+    method: 'POST',
+    url: '/properties',
+    data: body,
+    operation: 'property_create',
+  });
+
+/** PATCH /v1/properties/:id — solo lo que cambió. */
+export const updateProperty = ({
+  propertyId,
+  changes,
+}: {
+  propertyId: string;
+  changes: Partial<PropertyInput>;
+}) =>
+  apiRequest<Property>({
+    method: 'PATCH',
+    url: `/properties/${encodeURIComponent(propertyId)}`,
+    data: changes,
+    operation: 'property_update',
+  });
+
+/** POST /v1/properties/:id/complete-configuration — la habilita para Inicio si todo está revisado. */
+export const completePropertyConfiguration = (propertyId: string) =>
+  apiRequest<Property>({
+    method: 'POST',
+    url: `/properties/${encodeURIComponent(propertyId)}/complete-configuration`,
+    operation: 'property_complete',
+  });
+
+/** PATCH /v1/properties/:id/deactivate — baja lógica; bloqueada si alguien la renta hoy. */
+export const deactivateProperty = (propertyId: string) =>
+  apiRequest<{ id: string; status: 'inactive'; deactivated_at: string | null }>({
+    method: 'PATCH',
+    url: `/properties/${encodeURIComponent(propertyId)}/deactivate`,
+    operation: 'property_deactivate',
+  });

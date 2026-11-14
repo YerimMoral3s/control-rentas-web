@@ -14,7 +14,7 @@ import {
 import { useTenant } from '@hooks/querys/tenants';
 import { formatPhone } from '@lib/format';
 import { useResultNotice } from '@lib/useResultNotice';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { CurrentUnitsSection, HistorySection } from './components/ContractSections';
 import { DeleteTenantDialog } from './components/DeleteTenantDialog';
 import { OverdueSection } from './components/OverdueSection';
@@ -35,8 +35,7 @@ const Header = styled.header`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 

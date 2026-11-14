@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
+import { media } from '@styles/theme';
 
 const Wrap = styled.div`
   position: relative;
@@ -9,6 +10,12 @@ const Wrap = styled.div`
 const Trigger = styled.button`
   height: ${({ theme }) => theme.size.touchPrimary};
   min-width: ${({ theme }) => theme.size.touchPrimary};
+
+  ${media.compact} {
+    height: 40px;
+    min-width: 40px;
+  }
+
   padding: 0 14px;
   display: inline-flex;
   align-items: center;

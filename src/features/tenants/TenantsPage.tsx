@@ -15,7 +15,7 @@ import {
 import { useTenants } from '@hooks/querys/tenants';
 import { useMediaQuery } from '@lib/useMediaQuery';
 import { useResultNotice } from '@lib/useResultNotice';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import {
   Cards,
   Table,
@@ -46,8 +46,7 @@ const Head = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 

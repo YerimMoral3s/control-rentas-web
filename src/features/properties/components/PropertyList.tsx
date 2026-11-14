@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import type { Property } from '@api/properties';
-import { Button, FROM_LIST_STATE, Icon, StatusBadge } from '@components';
+import { ButtonLink, FROM_LIST_STATE, Icon, StatusBadge } from '@components';
 import { media } from '@styles/theme';
 import {
   isSingleUnit,
@@ -158,9 +158,9 @@ export function PropertyRow({ property }: { property: Property }) {
     <li>
       <Row to={`/propiedades/${property.id}`} state={FROM_LIST_STATE}>
         <Main>
-          {/* Casa o bodega: la unidad es el título y la propiedad, el texto secundario (FE-16). */}
-          <strong>{single ? single.name : property.name}</strong>
-          <Aux>{single ? property.name : location}</Aux>
+          {/* Casa o bodega: solo el nombre de la propiedad (acuerdo de 4B); su unidad única no se repite. */}
+          <strong>{property.name}</strong>
+          {location ? <Aux>{location}</Aux> : null}
           <MobileOnly>
             <Aux>
               {single
@@ -235,7 +235,7 @@ const Progress = styled.span`
   color: ${({ theme }) => theme.color.warning};
 `;
 
-/** P-01 / P-02: propiedad incompleta, primero en la lista. Continuar configuración llega en la fase 4. */
+/** P-01 / P-02: propiedad incompleta, primero en la lista. Continuar abre el primer paso pendiente. */
 export function IncompletePropertyRow({ property }: { property: Property }) {
   const { reviewed_units, total_units } = property.configuration_progress;
   return (
@@ -247,9 +247,9 @@ export function IncompletePropertyRow({ property }: { property: Property }) {
           Configuración incompleta · {reviewed_units} de {total_units} unidades revisadas
         </Progress>
       </IncompleteText>
-      <Button variant="secondary" disabled title="Disponible próximamente">
+      <ButtonLink variant="secondary" to={`/propiedades/${property.id}/configurar`}>
         Continuar configuración
-      </Button>
+      </ButtonLink>
     </Incomplete>
   );
 }

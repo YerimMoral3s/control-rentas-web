@@ -5,6 +5,7 @@ import { useCreateTenant } from '@hooks/querys/tenants';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
 import { withResult } from '@lib/useResultNotice';
 import { TenantForm, toTenantInput } from './components/TenantForm';
+import { pageTitle } from '@styles/theme';
 
 export const FormPage = styled.div`
   display: flex;
@@ -13,8 +14,7 @@ export const FormPage = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 

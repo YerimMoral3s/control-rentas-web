@@ -5,7 +5,7 @@ import { useDashboardSummary } from '@hooks/querys/dashboard';
 import { useAttentionPayments } from '@hooks/querys/payments';
 import { formatLongDate, monthName } from '@lib/dates';
 import { useMediaQuery } from '@lib/useMediaQuery';
-import { theme as tokens } from '@styles/theme';
+import { theme as tokens, pageTitle, media } from '@styles/theme';
 import { AttentionPayments } from './components/AttentionPayments';
 import { RentalAlerts } from './components/RentalAlerts';
 import { SectionError } from './components/SectionError';
@@ -32,13 +32,17 @@ const DateLine = styled.span`
 
 const Title = styled.h1`
   margin: 0;
-  font-size: 28px;
-  line-height: 34px;
+  ${pageTitle}
   font-weight: 700;
 `;
 
 const SetupLink = styled(Link)`
   height: ${({ theme }) => theme.size.touchPrimary};
+
+  ${media.compact} {
+    height: 40px;
+  }
+
   padding: 0 20px;
   display: inline-flex;
   align-items: center;
@@ -93,7 +97,7 @@ export function HomePage() {
           kind="empty"
           title="Configura tus rentas para empezar"
           description="Agrega tu primera propiedad, sus unidades y quién las renta. Puedes guardar y continuar después."
-          action={<SetupLink to="/propiedades">Configurar mis rentas</SetupLink>}
+          action={<SetupLink to="/propiedades/nueva?desde=inicio">Configurar mis rentas</SetupLink>}
         />
       </Page>
     );

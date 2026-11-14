@@ -93,6 +93,8 @@ export type AppTheme = typeof theme;
 export const media = {
   desktop: `@media (min-width: ${theme.breakpoint.desktop})`,
   wide: `@media (min-width: ${theme.breakpoint.wide})`,
+  /** Teléfono y tableta (debajo de wide): controles compactos de 40 px (acuerdo del 13 nov.). */
+  compact: `@media (max-width: calc(${theme.breakpoint.wide} - 0.02px))`,
   reducedMotion: '@media (prefers-reduced-motion: reduce)',
 } as const;
 
@@ -103,4 +105,18 @@ export const clampLines = (lines: number) => `
   -webkit-line-clamp: ${lines};
   line-clamp: ${lines};
   overflow: hidden;
+`;
+
+/**
+ * Título de página (F-01 "page"): 28/34 en computadora; en teléfono un poco más chico (24/30)
+ * para que palabras como "Propiedades" quepan junto a su botón (acuerdo del 13 nov.).
+ */
+export const pageTitle = `
+  font-size: 24px;
+  line-height: 30px;
+
+  @media (min-width: ${theme.breakpoint.desktop}) {
+    font-size: ${theme.text.page.size};
+    line-height: ${theme.text.page.line};
+  }
 `;

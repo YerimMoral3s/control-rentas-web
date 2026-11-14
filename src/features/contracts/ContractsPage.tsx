@@ -14,7 +14,7 @@ import {
 } from '@components';
 import { useContracts } from '@hooks/querys/contracts';
 import { useMediaQuery } from '@lib/useMediaQuery';
-import { media, theme as tokens } from '@styles/theme';
+import { media, theme as tokens, pageTitle } from '@styles/theme';
 import {
   Cards,
   ContractCard,
@@ -50,8 +50,7 @@ const Page = styled.div`
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    line-height: 34px;
+    ${pageTitle}
   }
 `;
 
