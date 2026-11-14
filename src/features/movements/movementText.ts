@@ -1,24 +1,9 @@
 import type { Movement } from '@api/movements';
-import { formatTime, monthName } from '@lib/dates';
+import { formatTime } from '@lib/dates';
 import { movementTypeName } from '@lib/labels';
 import { placeName } from '@lib/place';
 
 /** Textos de Movimientos, solo presentación (importes y signos vienen del backend). */
-
-/**
- * Concepto visible. FE-26: hoy la API entrega la clave del periodo ("2026-10", "DEPOSIT") en lugar
- * del texto ("Renta octubre 2026"); mientras BACK lo corrige, se presenta aquí sin cambiar el dato.
- */
-export const movementConcept = (movement: Movement) => {
-  const period = /^(\d{4})-(\d{2})$/.exec(movement.concept);
-  if (movement.type === 'monthly_rent' && period) {
-    return `Renta ${monthName(Number(period[1]), Number(period[2]))} ${period[1]}`;
-  }
-  if (movement.type === 'deposit' && movement.concept === 'DEPOSIT') return 'Depósito';
-  // Algunos gastos llegan con la clave de su tipo ("deposit_refund") como concepto.
-  if (movement.concept === movement.type) return movementTypeName(movement.type);
-  return movement.concept;
-};
 
 /** "María López · Torre Centro / Departamento 101", el inmueble solo o la persona sola. */
 export const movementRelated = (movement: Movement) => {

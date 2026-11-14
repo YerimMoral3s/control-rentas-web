@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import type { Movement } from '@api/movements';
 import {
   groupByDate,
-  movementConcept,
   movementAmount,
   movementKindLine,
   movementLink,
@@ -57,13 +56,5 @@ describe('textos de movimientos', () => {
       ['2026-10-27', 2],
       ['2026-10-26', 1],
     ]);
-  });
-
-  it('presenta la clave del periodo como concepto legible (FE-26)', () => {
-    expect(movementConcept(movement({ concept: '2026-10' }))).toBe('Renta octubre 2026');
-    expect(movementConcept(movement({ type: 'deposit', concept: 'DEPOSIT' }))).toBe('Depósito');
-    expect(movementConcept(movement({ type: 'maintenance', concept: 'Pintura y resane' }))).toBe(
-      'Pintura y resane',
-    );
   });
 });

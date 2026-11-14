@@ -10,7 +10,6 @@ import {
   movementKindLine,
   movementLink,
   movementRelated,
-  movementConcept,
 } from '../movementText';
 
 const Groups = styled.div`
@@ -210,7 +209,7 @@ export function MovementList({ movements, today, desktop }: MovementListProps) {
                       <InlineIcon $income={income} aria-hidden="true">
                         <Icon name={income ? 'moneyIn' : 'moneyOut'} size={16} strokeWidth={2.4} />
                       </InlineIcon>
-                      <Concept>{movementConcept(movement)}</Concept>
+                      <Concept>{movement.concept}</Concept>
                     </ConceptCell>
                     <Related>{movementRelated(movement)}</Related>
                     <Kind>
