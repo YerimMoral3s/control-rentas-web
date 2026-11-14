@@ -34,6 +34,10 @@ export const ICONS = {
   chevronLeft: <path d="M15 6l-6 6 6 6" />,
   chevronRight: <path d="m9 6 6 6-6 6" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  /** M-02: dinero que entró. */
+  moneyIn: <path d="M12 4v13M6 11l6 6 6-6M5 20h14" />,
+  /** M-03: dinero que salió. */
+  moneyOut: <path d="M12 20V7M6 13l6-6 6 6M5 4h14" />,
   calendar: (
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
