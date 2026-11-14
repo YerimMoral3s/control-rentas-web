@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import type { Tenant } from '@api/tenants';
 import { Button, Icon, Notice, SearchField, SectionError, Skeleton } from '@components';
 import { TenantForm, toTenantInput } from '@features/tenants/components/TenantForm';
-import { buildTenantIndex, searchTenantIds } from '@features/tenants/catalog/tenantSearch';
-import { useCreateTenant, useTenantsCatalog } from '@hooks/querys/tenants';
+import { useTenantSearch } from '@features/tenants/catalog/useTenantSearch';
+import { useCreateTenant } from '@hooks/querys/tenants';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
 import { formatPhone } from '@lib/format';
 import { media } from '@styles/theme';
@@ -119,7 +119,6 @@ type TenantPickerProps = {
  * crea uno nuevo (T-07) sin perder el avance; al crearlo queda seleccionado.
  */
 export function TenantPicker({ unitName, selectedId, onSelect, onContinue }: TenantPickerProps) {
-  const catalog = useTenantsCatalog();
   const events = useInvalidateEvents();
   const create = useCreateTenant();
   const [term, setTerm] = useState('');
@@ -127,16 +126,7 @@ export function TenantPicker({ unitName, selectedId, onSelect, onContinue }: Ten
   const [created, setCreated] = useState<string | null>(null);
   const [missing, setMissing] = useState(false);
 
-  const tenants = useMemo(() => catalog.data?.data ?? [], [catalog.data]);
-  // Reactor: el índice se rehace cuando cambia el catálogo (también después de invalidarlo).
-  const index = useMemo(() => buildTenantIndex(tenants), [tenants]);
-  const results = useMemo(() => {
-    if (!term.trim()) return tenants;
-    const byId = new Map(tenants.map(tenant => [tenant.id, tenant]));
-    return searchTenantIds(index, term)
-      .map(id => byId.get(id))
-      .filter((tenant): tenant is Tenant => Boolean(tenant));
-  }, [index, tenants, term]);
+  const { catalog, results } = useTenantSearch(term);
 
   if (creating) {
     return (

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import styled from 'styled-components';
-import { useDebounce } from 'use-debounce';
 import {
   Button,
   ButtonLink,
@@ -12,7 +11,6 @@ import {
   Skeleton,
   StateMessage,
 } from '@components';
-import { useTenants } from '@hooks/querys/tenants';
 import { useMediaQuery } from '@lib/useMediaQuery';
 import { useResultNotice } from '@lib/useResultNotice';
 import { media, theme as tokens, pageTitle } from '@styles/theme';
@@ -25,8 +23,10 @@ import {
   TenantTableHeader,
 } from './components/TenantList';
 import { TenantQuickView } from './components/TenantQuickView';
+import { useTenantSearch } from './catalog/useTenantSearch';
 
-const SEARCH_DEBOUNCE_MS = 350;
+/** Se muestran de 20 en 20 al hacer scroll (la lista completa ya está en el catálogo). */
+const PAGE = 20;
 
 const Page = styled.div`
   display: flex;
@@ -77,7 +77,10 @@ function CreateTenantButton() {
   );
 }
 
-/** T-01 y T-02: lista de inquilinos con búsqueda del servidor, scroll infinito y vista rápida. */
+/**
+ * T-01 y T-02: lista de inquilinos con vista rápida. Usa el catálogo completo (acuerdo del 14 nov.):
+ * búsqueda local con MiniSearch al escribir y scroll infinito sin pedir más al servidor.
+ */
 export function TenantsPage() {
   const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
   const isWide = useMediaQuery(`(min-width: ${tokens.breakpoint.wide})`);
@@ -86,12 +89,21 @@ export function TenantsPage() {
   const search = params.get('q') ?? '';
   const setSearch = (value: string) =>
     setParams(value ? { q: value } : {}, { replace: true, preventScrollReset: true });
-  const [debouncedSearch] = useDebounce(search.trim(), SEARCH_DEBOUNCE_MS);
-  const query = useTenants(debouncedSearch);
+  const term = search.trim();
+  const { catalog: query, results } = useTenantSearch(term, { byName: true });
+  // Cuántos se muestran para la búsqueda actual; una búsqueda nueva vuelve a los primeros 20.
+  const [paging, setPaging] = useState({ term, count: PAGE });
+  const visible = paging.term === term ? paging.count : PAGE;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { result, dismiss } = useResultNotice();
 
-  const items = query.items;
+  const items = results.slice(0, visible);
+  const more = {
+    hasNextPage: visible < results.length,
+    isFetchingNextPage: false,
+    isFetchNextPageError: false,
+    fetchNextPage: () => setPaging({ term, count: visible + PAGE }),
+  };
   const selected = isWide ? items.find(tenant => tenant.id === selectedId) : undefined;
 
   const closeQuickView = () => {
@@ -140,10 +152,10 @@ export function TenantsPage() {
   } else if (query.isError && !query.data) {
     content = <SectionError onRetry={() => void query.refetch()} retrying={query.isFetching} />;
   } else if (items.length === 0) {
-    content = debouncedSearch ? (
+    content = term ? (
       <StateMessage
         kind="empty"
-        title={`No encontramos “${debouncedSearch}”`}
+        title={`No encontramos “${term}”`}
         description="Prueba con otro nombre, teléfono o unidad."
         action={
           <Button variant="secondary" onClick={() => setSearch('')}>
@@ -184,11 +196,11 @@ export function TenantsPage() {
       </Table>
     );
     content = (
-      <Layout aria-busy={query.isPlaceholderData || undefined}>
+      <Layout>
         <ListColumn>
           {list}
           <ListFooter
-            query={query}
+            query={more}
             endLabel="No hay más inquilinos"
             errorLabel="No pudimos cargar más inquilinos"
             skeletonHeight={isDesktop ? '64px' : '112px'}

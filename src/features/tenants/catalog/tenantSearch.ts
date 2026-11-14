@@ -2,15 +2,17 @@ import MiniSearch from 'minisearch';
 import type { Tenant } from '@api/tenants';
 
 /**
- * Motor MiniSearch del catálogo de inquilinos (patrón appv2/features/clients): busca por nombre,
- * apellidos, alias y teléfonos, con prefijos y errores pequeños de escritura. Devuelve IDs; quien
- * lo usa los resuelve contra el catálogo.
+ * Motor MiniSearch del catálogo de inquilinos (patrón appv2/features/clients): busca lo mismo que
+ * el `search` del servidor (nombre, apellidos, alias, teléfonos y la unidad que renta), con
+ * prefijos y errores pequeños de escritura. Devuelve IDs; quien lo usa los resuelve.
  */
 type TenantDocument = {
   id: string;
   name: string;
   alias: string;
   phones: string;
+  /** Unidades y propiedades que renta hoy ("Departamento 101 Torre Centro"). */
+  places: string;
 };
 
 const digits = (value: string | null) => value?.replace(/\D/g, '') ?? '';
@@ -31,11 +33,14 @@ const toDocument = (tenant: Tenant): TenantDocument => ({
   name: `${tenant.first_name} ${tenant.last_name}`,
   alias: tenant.alias ?? '',
   phones: [phoneGrams(tenant.phone), phoneGrams(tenant.secondary_phone)].join(' '),
+  places: tenant.current_contracts
+    .map(contract => `${contract.unit.name} ${contract.unit.property.name}`)
+    .join(' '),
 });
 
 export const buildTenantIndex = (tenants: Tenant[]) => {
   const index = new MiniSearch<TenantDocument>({
-    fields: ['name', 'alias', 'phones'],
+    fields: ['name', 'alias', 'phones', 'places'],
     storeFields: ['id'],
     searchOptions: { prefix: true, fuzzy: 0.2, combineWith: 'AND' },
   });

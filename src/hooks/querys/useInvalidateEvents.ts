@@ -18,7 +18,7 @@ export const useInvalidateEvents = () => {
 
   return {
     /** Inquilino nuevo: aparece en la lista y en búsquedas. */
-    tenantCreated: () => invalidate([TenantsQueryKeys.listRoot, TenantsQueryKeys.catalog]),
+    tenantCreated: () => invalidate([TenantsQueryKeys.catalog]),
     /** Nombre o teléfono cambiaron: se muestran también en contratos, cobros y movimientos. */
     tenantUpdated: (tenantId: string) =>
       invalidate([
@@ -31,7 +31,6 @@ export const useInvalidateEvents = () => {
     /** Baja lógica: sale de la lista. Sus contratos y cobros se conservan. */
     tenantDeactivated: (tenantId: string) =>
       invalidate([
-        TenantsQueryKeys.listRoot,
         TenantsQueryKeys.catalog,
         TenantsQueryKeys.detail(tenantId),
         DashboardQueryKeys.root,
@@ -62,7 +61,6 @@ export const useInvalidateEvents = () => {
         UnitsQueryKeys.root,
         PropertiesQueryKeys.root,
         TenantsQueryKeys.detail(tenantId),
-        TenantsQueryKeys.listRoot,
         TenantsQueryKeys.catalog,
         DashboardQueryKeys.root,
       ]),
