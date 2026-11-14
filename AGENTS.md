@@ -6,7 +6,8 @@ Respeta primero `../AGENTS.md` (común). Este archivo no amplía permisos ni cop
 
 - Rol FRONT. Puede modificar este proyecto y `../front-files/`.
 - No modifica fuentes de Producto, UI/UX ni BACK. Los ajustes necesarios se comunican al responsable.
-- Al retomar el trabajo, lee `../front-files/memoria.md` (acuerdos) y `../front-files/fases.md` (plan y avance).
+- **Siempre** al empezar o retomar una fase o subfase, y antes de cada pantalla, lee `../front-files/memoria.md` (acuerdos y preferencias del usuario) y `../front-files/fases.md` (plan, avance y hallazgos FE-xx).
+- Cuando el usuario fije o cambie un acuerdo, actualiza `memoria.md` en el momento; el avance y los hallazgos van en `fases.md`.
 - Se trabaja una fase por solicitud y se detiene para revisión.
 
 ## Antes de construir cada pantalla (obligatorio)
