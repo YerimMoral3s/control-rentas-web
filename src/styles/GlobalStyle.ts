@@ -16,6 +16,8 @@ export const GlobalStyle = createGlobalStyle`
     font-family: ${({ theme }) => theme.font.family};
     font-size: ${({ theme }) => theme.text.body.size};
     line-height: ${({ theme }) => theme.text.body.line};
+    /* Palabras muy largas (enlaces, textos sin espacios) se parten en lugar de salirse de su columna. */
+    overflow-wrap: anywhere;
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
   }
