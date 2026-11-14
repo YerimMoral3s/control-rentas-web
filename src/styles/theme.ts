@@ -95,3 +95,12 @@ export const media = {
   wide: `@media (min-width: ${theme.breakpoint.wide})`,
   reducedMotion: '@media (prefers-reduced-motion: reduce)',
 } as const;
+
+/** Corta un texto a `lines` líneas con "…" (listas); el texto completo vive en el detalle. */
+export const clampLines = (lines: number) => `
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${lines};
+  line-clamp: ${lines};
+  overflow: hidden;
+`;

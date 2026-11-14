@@ -1,4 +1,5 @@
 import { apiRequest } from './http';
+import type { PropertyType } from './properties';
 import type { PaginatedMeta } from './types';
 
 /** Contrato: apis/expenses_api_control_rentas.txt */
@@ -21,8 +22,13 @@ export type Expense = {
   description: string | null;
   related_contract_id: string | null;
   /** Exactamente uno de property/unit en un gasto ordinario. */
-  property: { id: string; name: string } | null;
-  unit: { id: string; name: string } | null;
+  property: { id: string; name: string; property_type: PropertyType } | null;
+  /** FE-25: la API ya entrega la propiedad de la unidad (falta en la ficha de BACK); se trata como opcional. */
+  unit: {
+    id: string;
+    name: string;
+    property?: { id: string; name: string; property_type: PropertyType };
+  } | null;
   deactivated_at: string | null;
   deposit_payment: { id: string } | null;
   created_at: string;
@@ -44,4 +50,13 @@ export const getExpenses = (params: ExpenseListParams, signal?: AbortSignal) =>
     params,
     signal,
     operation: 'expenses_list',
+  });
+
+/** GET /v1/expenses/:id — solo gastos activos (uno inactivo responde 404). */
+export const getExpense = (expenseId: string, signal?: AbortSignal) =>
+  apiRequest<Expense>({
+    method: 'GET',
+    url: `/expenses/${encodeURIComponent(expenseId)}`,
+    signal,
+    operation: 'expense_detail',
   });

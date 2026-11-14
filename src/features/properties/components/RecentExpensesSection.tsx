@@ -1,9 +1,18 @@
+import { Link } from 'react-router';
 import styled from 'styled-components';
-import { Button, DetailSection, MutedText, Panel, SectionError, Skeleton } from '@components';
+import {
+  Button,
+  DetailSection,
+  MutedText,
+  Panel,
+  SectionError,
+  Skeleton,
+  FROM_LIST_STATE,
+} from '@components';
 import { useRecentMovements } from '@hooks/querys/movements';
 import { formatDateWithYear } from '@lib/dates';
 import { formatSignedMoney } from '@lib/format';
-import { theme as tokens } from '@styles/theme';
+import { clampLines, theme as tokens } from '@styles/theme';
 
 const RECENT_SIZE = 5;
 
@@ -12,12 +21,18 @@ const Rows = styled.ul`
   padding: 0;
   list-style: none;
 
-  li {
+  li > a {
     padding: 12px 16px;
     display: grid;
+    color: ${({ theme }) => theme.color.neutral950};
+    text-decoration: none;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 2px 12px;
     align-items: center;
+  }
+
+  li > a:hover {
+    background: ${({ theme }) => theme.color.neutral50};
   }
 
   li + li {
@@ -27,6 +42,7 @@ const Rows = styled.ul`
   strong {
     font-size: 15px;
     line-height: 22px;
+    ${clampLines(2)}
   }
 `;
 
@@ -71,12 +87,14 @@ export function RecentExpensesSection({ propertyId }: { propertyId: string }) {
           <Rows>
             {query.data.data.map(movement => (
               <li key={`${movement.source.type}-${movement.source.id}`}>
-                <strong>{movement.concept}</strong>
-                <Sub>
-                  {movement.unit?.name ?? movement.property?.name ?? ''} ·{' '}
-                  {formatDateWithYear(movement.date)}
-                </Sub>
-                <Amount>{formatSignedMoney(movement.amount)}</Amount>
+                <Link to={`/gastos/${movement.source.id}`} state={FROM_LIST_STATE}>
+                  <strong>{movement.concept}</strong>
+                  <Sub>
+                    {movement.unit?.name ?? movement.property?.name ?? ''} ·{' '}
+                    {formatDateWithYear(movement.date)}
+                  </Sub>
+                  <Amount>{formatSignedMoney(movement.amount)}</Amount>
+                </Link>
               </li>
             ))}
           </Rows>

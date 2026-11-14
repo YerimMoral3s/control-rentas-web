@@ -1,4 +1,3 @@
-import type { ExpenseType } from '@api/expenses';
 import type { Property, PropertyType } from '@api/properties';
 import type { UnitType } from '@api/units';
 
@@ -63,15 +62,3 @@ export const addressLine = (property: Property) => {
 
 /** Texto corto de ubicación para listas: colonia o ciudad. */
 export const shortLocation = (property: Property) => property.neighborhood || property.city || null;
-
-const EXPENSE_TYPE: Record<ExpenseType, string> = {
-  maintenance: 'Mantenimiento',
-  cleaning: 'Limpieza',
-  utilities: 'Servicios',
-  taxes: 'Impuestos',
-  administrative: 'Administrativo',
-  deposit_refund: 'Devolución de depósito',
-  other: 'Otro gasto',
-};
-
-export const expenseTypeLabel = (type: ExpenseType) => EXPENSE_TYPE[type];

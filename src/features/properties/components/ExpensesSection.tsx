@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import styled from 'styled-components';
 import {
   Button,
@@ -7,24 +8,31 @@ import {
   Panel,
   SectionError,
   Skeleton,
+  FROM_LIST_STATE,
 } from '@components';
 import { useExpenses } from '@hooks/querys/expenses';
 import { formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
-import { theme as tokens } from '@styles/theme';
-import { expenseTypeLabel } from '../propertyText';
+import { clampLines, theme as tokens } from '@styles/theme';
+import { expenseTypeLabel } from '@lib/labels';
 
 const Rows = styled.ul`
   margin: 0;
   padding: 0;
   list-style: none;
 
-  li {
+  li > a {
     padding: 12px 16px;
     display: grid;
+    color: ${({ theme }) => theme.color.neutral950};
+    text-decoration: none;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 2px 12px;
     align-items: center;
+  }
+
+  li > a:hover {
+    background: ${({ theme }) => theme.color.neutral50};
   }
 
   li + li {
@@ -34,6 +42,7 @@ const Rows = styled.ul`
   strong {
     font-size: 15px;
     line-height: 22px;
+    ${clampLines(2)}
   }
 `;
 
@@ -80,9 +89,11 @@ export function ExpensesSection({ filters }: ExpensesSectionProps) {
           <Rows>
             {query.items.map(expense => (
               <li key={expense.id}>
-                <strong>{expense.description || expenseTypeLabel(expense.expense_type)}</strong>
-                <Sub>{formatDateWithYear(expense.expense_date)}</Sub>
-                <Amount>−{formatMoney(expense.amount)}</Amount>
+                <Link to={`/gastos/${expense.id}`} state={FROM_LIST_STATE}>
+                  <strong>{expense.description || expenseTypeLabel(expense.expense_type)}</strong>
+                  <Sub>{formatDateWithYear(expense.expense_date)}</Sub>
+                  <Amount>−{formatMoney(expense.amount)}</Amount>
+                </Link>
               </li>
             ))}
           </Rows>

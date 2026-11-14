@@ -5,7 +5,9 @@ import { PendingScreen } from '@features/pending/PendingScreen';
 import { LoginPage } from '@features/access/LoginPage';
 import { ContractDetailPage } from '@features/contracts/ContractDetailPage';
 import { ContractsPage } from '@features/contracts/ContractsPage';
+import { ExpenseDetailPage } from '@features/expenses/ExpenseDetailPage';
 import { HomePage } from '@features/home/HomePage';
+import { MovementsPage } from '@features/movements/MovementsPage';
 import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
 import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
@@ -37,7 +39,8 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'inquilinos', element: <TenantsPage /> },
       { path: 'inquilinos/:tenantId', element: <TenantDetailPage /> },
-      { path: 'movimientos', element: <PendingScreen title="Movimientos" /> },
+      { path: 'movimientos', element: <MovementsPage /> },
+      { path: 'gastos/:expenseId', element: <ExpenseDetailPage /> },
       { path: 'propiedades', element: <PropertiesPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },
       { path: 'contratos', element: <ContractsPage /> },

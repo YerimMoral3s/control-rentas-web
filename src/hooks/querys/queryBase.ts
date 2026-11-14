@@ -39,11 +39,15 @@ export const InfiniteQueryPolicy = {
   maxPages: 10,
 } as const;
 
-export const flattenUniqueById = <T extends { id: string }>(
+const defaultItemKey = (item: unknown) => (item as { id: string }).id;
+
+/** Une las páginas sin repetir registros (uno puede cambiar de página entre consultas). */
+export const flattenUniqueById = <T>(
   pages: ReadonlyArray<ReadonlyArray<T> | null | undefined>,
+  getKey: (item: T) => string = defaultItemKey,
 ): T[] => {
   const byId = new Map<string, T>();
-  for (const page of pages) for (const item of page ?? []) byId.set(item.id, item);
+  for (const page of pages) for (const item of page ?? []) byId.set(getKey(item), item);
   return Array.from(byId.values());
 };
 
@@ -73,7 +77,7 @@ type InfiniteRequest<TItem, TMeta extends PaginatedMeta> = (
  * los conteos y totales vienen completos del servidor, nunca se suman páginas.
  */
 export const useBaseInfiniteQuery = <
-  TItem extends { id: string },
+  TItem,
   TMeta extends PaginatedMeta,
   TKey extends readonly unknown[],
 >(
@@ -81,6 +85,8 @@ export const useBaseInfiniteQuery = <
   request: InfiniteRequest<TItem, TMeta>,
   staleTime: number,
   enabled = true,
+  /** Clave única de cada registro; por defecto su `id`. */
+  getKey?: (item: TItem) => string,
 ) => {
   const query = useInfiniteQuery({
     queryKey,
@@ -98,7 +104,7 @@ export const useBaseInfiniteQuery = <
   const pages = query.data?.pages;
   return {
     ...query,
-    items: flattenUniqueById(pages?.map(page => page.data) ?? []),
+    items: flattenUniqueById<TItem>(pages?.map(page => page.data) ?? [], getKey),
     meta: pages?.[0]?.meta,
   };
 };
