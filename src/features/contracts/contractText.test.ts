@@ -14,6 +14,7 @@ const contract = (fields: Partial<Contract>): Contract => ({
   unit: { id: 'u', name: 'Departamento 101' },
   property: { id: 'p', name: 'Torre Centro', property_type: 'building' },
   deposit: null,
+  next_contract: null,
   previous_contract_id: null,
   vacated_at: null,
   duration_months: 12,

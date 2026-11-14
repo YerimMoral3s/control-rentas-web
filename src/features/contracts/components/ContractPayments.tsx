@@ -99,6 +99,12 @@ const Actions = styled.span`
   align-items: center;
   gap: 4px;
   margin-right: -10px;
+
+  /* Petición del usuario (13 nov.): Registrar pago de la lista a 33 px para no alargar la fila. */
+  button {
+    height: 33px;
+    min-height: 33px;
+  }
 `;
 
 const ChipsWrap = styled.div`

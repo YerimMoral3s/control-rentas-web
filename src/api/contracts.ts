@@ -44,6 +44,11 @@ export type ContractDeposit = {
 /** Modelo Contract completo. */
 export type Contract = ContractSummary & {
   deposit: ContractDeposit | null;
+  /**
+   * FE-24: continuación inmediata (A→B). No garantiza que B siga siendo el contrato actual
+   * si después hubo otra continuación (B→C).
+   */
+  next_contract: { id: string; start_date: string } | null;
   previous_contract_id: string | null;
   vacated_at: string | null;
   duration_months: number;
@@ -63,9 +68,14 @@ export type ContractListParams = {
   page_size: number;
 };
 
+/** FE-23: conteos completos con la búsqueda y filtros aplicados, sin importar el `status` elegido. */
+export type ContractListMeta = PaginatedMeta & {
+  counts: Record<'all' | ContractStatus, number>;
+};
+
 /** GET /v1/contracts — lista paginada con filtros publicados. */
 export const getContracts = (params: ContractListParams, signal?: AbortSignal) =>
-  apiRequest<Contract[], PaginatedMeta>({
+  apiRequest<Contract[], ContractListMeta>({
     method: 'GET',
     url: '/contracts',
     params,

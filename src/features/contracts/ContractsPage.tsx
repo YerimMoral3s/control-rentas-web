@@ -29,7 +29,6 @@ const SEARCH_DEBOUNCE_MS = 350;
 
 type StatusFilter = 'all' | ContractStatus;
 
-/** FE-23: los chips aún no traen conteos del servidor; se muestran sin número. */
 const CHIPS: ReadonlyArray<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'Todos' },
   { value: 'active', label: 'Activos' },
@@ -202,7 +201,7 @@ export function ContractsPage() {
           setSelectedId(null);
           update({ estado: value });
         }}
-        options={CHIPS}
+        options={CHIPS.map(chip => ({ ...chip, count: query.meta?.counts[chip.value] }))}
       />
       {content}
     </Page>

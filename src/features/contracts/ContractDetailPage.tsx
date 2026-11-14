@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Contract } from '@api/contracts';
 import {
+  ActionLink,
   Button,
   ContractMark,
   DetailSection,
@@ -122,8 +123,21 @@ function StatusNotice({ contract }: { contract: Contract }) {
     );
   }
   if (!contract.is_current) {
-    // FE-24: sin el contrato que lo sucedió, no se enlaza al actual.
-    return (
+    // FE-24: `next_contract` es la continuación inmediata; no se afirma que siga siendo la actual.
+    return contract.next_contract ? (
+      <Notice
+        tone="info"
+        title={`La renta continuó en otro contrato desde el ${formatDateWithYear(contract.next_contract.start_date)}.`}
+        action={
+          <ActionLink to={`/contratos/${contract.next_contract.id}`}>
+            Ver contrato siguiente
+          </ActionLink>
+        }
+      >
+        Este contrato ya no es la ocupación actual. Puedes consultar sus cobros y registrar pagos
+        atrasados.
+      </Notice>
+    ) : (
       <Notice tone="info" title="Este contrato ya no es la ocupación actual.">
         Puedes consultar sus cobros y registrar pagos atrasados.
       </Notice>
