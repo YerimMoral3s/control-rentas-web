@@ -1,4 +1,5 @@
-import { useQueryClient, type QueryKey } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query';
 import { ContractsQueryKeys } from './contracts';
 import { DashboardQueryKeys } from './dashboard';
 import { MovementsQueryKeys } from './movements';
@@ -11,8 +12,7 @@ import { UnitsQueryKeys } from './units';
  * Un evento por acción de dominio (patrón appv2). Cada uno invalida solo las consultas que esa
  * acción puede cambiar; nunca toda la caché.
  */
-export const useInvalidateEvents = () => {
-  const queryClient = useQueryClient();
+const buildEvents = (queryClient: QueryClient) => {
   const invalidate = (queryKeys: QueryKey[]) =>
     Promise.all(queryKeys.map(queryKey => queryClient.invalidateQueries({ queryKey })));
 
@@ -51,10 +51,10 @@ export const useInvalidateEvents = () => {
     propertyDeactivated: () =>
       invalidate([PropertiesQueryKeys.root, UnitsQueryKeys.root, DashboardQueryKeys.root]),
     /**
-     * Renta actual guardada (P-10): contrato, cobros y depósito nuevos; la unidad queda Ocupada y
-     * el inquilino tiene una ocupación más.
+     * Contrato nuevo (C-09), continuidad (C-13) o renta actual guardada (P-10): contrato, cobros y depósito nuevos; la
+     * unidad queda Ocupada y el inquilino tiene una ocupación más.
      */
-    preexistingContractCreated: (tenantId: string) =>
+    contractCreated: (tenantId: string) =>
       invalidate([
         ContractsQueryKeys.root,
         PaymentsQueryKeys.root,
@@ -81,6 +81,24 @@ export const useInvalidateEvents = () => {
         MovementsQueryKeys.root,
         TenantsQueryKeys.root,
       ]),
+    /** C-16: renta o día de pago cambiados: el contrato, sus cobros, Inicio y el adeudo. */
+    contractUpdated: () =>
+      invalidate([
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        TenantsQueryKeys.root,
+        DashboardQueryKeys.root,
+      ]),
+    /** C-17: contrato Terminado, unidad Disponible y rentas futuras Canceladas. */
+    contractTerminated: () =>
+      invalidate([
+        ContractsQueryKeys.root,
+        PaymentsQueryKeys.root,
+        UnitsQueryKeys.root,
+        PropertiesQueryKeys.root,
+        TenantsQueryKeys.root,
+        DashboardQueryKeys.root,
+      ]),
     /** Configuración completa: la propiedad y sus unidades entran a Inicio. */
     propertyCompleted: (propertyId: string) =>
       invalidate([
@@ -90,4 +108,10 @@ export const useInvalidateEvents = () => {
         DashboardQueryKeys.root,
       ]),
   };
+};
+
+/** Mismo objeto mientras no cambie el queryClient: se puede usar en dependencias de efectos. */
+export const useInvalidateEvents = () => {
+  const queryClient = useQueryClient();
+  return useMemo(() => buildEvents(queryClient), [queryClient]);
 };

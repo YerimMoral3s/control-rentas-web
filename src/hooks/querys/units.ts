@@ -9,6 +9,7 @@ import {
   reviewUnit,
   updateUnit,
   type Unit,
+  type UnitSummary,
 } from '@api/units';
 import type { ApiSuccess } from '@api/types';
 import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
@@ -19,6 +20,8 @@ export const UnitsQueryKeys = {
   byProperty: (propertyId: string) => ['units', 'list', propertyId] as const,
   allOfProperty: (propertyId: string) => ['units', 'list', propertyId, 'all'] as const,
   detail: (unitId: string) => ['units', 'detail', unitId] as const,
+  /** Unidades Disponibles de propiedades terminadas, todas, para elegir en Crear contrato (C-07). */
+  availableCatalog: ['units', 'catalog', 'available'] as const,
 };
 
 /** H-05: unidades disponibles o en mantenimiento (la sección y su hoja comparten la consulta). */
@@ -86,3 +89,21 @@ export const useUpdateUnit = () => useMutation({ retry: false, mutationFn: updat
 
 /** P-15: eliminar unidad (baja lógica). */
 export const useDeactivateUnit = () => useMutation({ retry: false, mutationFn: deactivateUnit });
+
+/**
+ * C-07: todas las unidades Disponibles y revisadas de propiedades terminadas (las mismas de Inicio),
+ * en páginas de 100, para buscarlas con MiniSearch. Se refresca con cualquier cambio de unidades.
+ */
+export const useAvailableUnitsCatalog = () =>
+  useBaseQuery(
+    UnitsQueryKeys.availableCatalog,
+    async (signal): Promise<ApiSuccess<UnitSummary[]>> => {
+      const items: UnitSummary[] = [];
+      for (let page = 1; ; page += 1) {
+        const response = await getDashboardUnits('available', page, QueryPageSize.max, signal);
+        items.push(...response.data);
+        if (!response.meta.pagination.has_next) return { data: items, meta: response.meta };
+      }
+    },
+    QueryStaleTime.operational,
+  );

@@ -6,6 +6,7 @@ import {
   ActionLink,
   ActionMenu,
   Button,
+  ButtonLink,
   DetailSection,
   ListFooter,
   MutedText,
@@ -131,7 +132,7 @@ const History = styled.ul`
 
 /**
  * Aviso del estado (U-02 vencido, U-03 mantenimiento) y acciones válidas: Enviar a mantenimiento
- * (U-04), Marcar como disponible (U-05) y Más acciones. Crear contrato llega en la fase 5.
+ * (U-04), Marcar como disponible (U-05), Crear contrato (C-07) y Más acciones.
  */
 export function UnitStatusArea({
   unit,
@@ -174,9 +175,7 @@ export function UnitStatusArea({
       <Actions>
         {unit.status === 'available' && unit.reviewed_at !== null ? (
           <>
-            <Button disabled title="Disponible próximamente">
-              Crear contrato
-            </Button>
+            <ButtonLink to={`/contratos/nuevo?unidad=${unit.id}`}>Crear contrato</ButtonLink>
             <Button variant="secondary" onClick={() => setTarget('maintenance')}>
               Enviar a mantenimiento
             </Button>

@@ -1,12 +1,14 @@
-import { Link, useParams } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Contract } from '@api/contracts';
 import {
   ActionLink,
+  ActionMenu,
   Button,
+  ButtonLink,
   ContractMark,
   DetailSection,
-  Icon,
   Notice,
   ReturnLink,
   SectionError,
@@ -18,10 +20,12 @@ import { useContract } from '@hooks/querys/contracts';
 import { formatDateRange, formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { placeName } from '@lib/place';
+import { useResultNotice } from '@lib/useResultNotice';
 import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { ContractPayments } from './components/ContractPayments';
 import { ContractSummaryBlocks } from './components/ContractSummary';
 import { contractKindLine, terminationDate } from './contractText';
+import { TerminateContractDialog } from './terminate/TerminateContractDialog';
 
 const Page = styled.div`
   width: 100%;
@@ -145,24 +149,36 @@ function StatusNotice({ contract }: { contract: Contract }) {
   return null;
 }
 
-/** Acciones válidas por estado; son escrituras de las fases 5 y 6, deshabilitadas sin simular. */
+/** Acciones válidas por estado. Las de cobros (fase 6) siguen deshabilitadas, sin simular. */
 function ContractActions({ contract }: { contract: Contract }) {
-  const more = (
-    <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
-      <Icon name="more" size={20} />
-    </Button>
-  );
+  const navigate = useNavigate();
+  const [terminating, setTerminating] = useState(false);
+  const current = contract.is_current && contract.status !== 'terminated';
+  const dialog = current ? (
+    <TerminateContractDialog
+      contract={contract}
+      open={terminating}
+      onClose={() => setTerminating(false)}
+    />
+  ) : null;
+  const edit = {
+    label: 'Editar contrato',
+    onSelect: () => void navigate(`/contratos/${contract.id}/editar`),
+  };
   if (contract.status === 'expired' && contract.is_current) {
     return (
       <Actions>
-        <Button {...comingSoon}>Continuar contrato</Button>
+        {contract.next_contract ? null : (
+          <ButtonLink to={`/contratos/${contract.id}/continuar`}>Continuar contrato</ButtonLink>
+        )}
         <Button variant="secondary" {...comingSoon}>
           Agregar renta
         </Button>
-        <Button variant="secondary" {...comingSoon}>
+        <Button variant="secondary" onClick={() => setTerminating(true)}>
           Terminar y desocupar
         </Button>
-        {more}
+        <ActionMenu items={[edit]} />
+        {dialog}
       </Actions>
     );
   }
@@ -172,7 +188,13 @@ function ContractActions({ contract }: { contract: Contract }) {
         <Button variant="secondary" icon="plus" {...comingSoon}>
           Agregar cargo
         </Button>
-        {more}
+        <ActionMenu
+          items={[
+            edit,
+            { label: 'Terminar y desocupar', danger: true, onSelect: () => setTerminating(true) },
+          ]}
+        />
+        {dialog}
       </Actions>
     );
   }
@@ -196,6 +218,7 @@ function ContractActions({ contract }: { contract: Contract }) {
 export function ContractDetailPage() {
   const { contractId } = useParams();
   const query = useContract(contractId);
+  const { result, dismiss } = useResultNotice();
   const back = <ReturnLink to="/contratos" label="Contratos" />;
 
   if (query.isPending) {
@@ -241,6 +264,11 @@ export function ContractDetailPage() {
           <ContractMark current={contract.is_current} />
         </Badges>
       </Header>
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
       <StatusNotice contract={contract} />
       <ContractSummaryBlocks contract={contract} />
       <ContractActions contract={contract} />

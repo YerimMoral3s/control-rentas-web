@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   civilDateOf,
   contractEndDate,
+  nextDay,
   formatDateRange,
   formatDateTime,
   formatDayHeading,
@@ -66,5 +67,13 @@ describe('fin de contrato preexistente (misma regla que BACK)', () => {
   it('acota el día al último del mes destino', () => {
     expect(contractEndDate('2026-08-31', 6)).toBe('2027-02-27');
     expect(contractEndDate('2027-08-31', 6)).toBe('2028-02-28');
+  });
+});
+
+describe('inicio de una continuidad', () => {
+  it('es el día siguiente al fin anterior', () => {
+    expect(nextDay('2026-09-30')).toBe('2026-10-01');
+    expect(nextDay('2026-12-31')).toBe('2027-01-01');
+    expect(nextDay('2028-02-28')).toBe('2028-02-29');
   });
 });
