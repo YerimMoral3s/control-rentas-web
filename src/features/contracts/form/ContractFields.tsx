@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button, Notice, OptionGroup, TextField } from '@components';
 import { contractEndDate, formatDateWithYear } from '@lib/dates';
 import { media } from '@styles/theme';
-import { StepFooter, StepIntro } from '../components/stepStyles';
+import { StepFooter, StepIntro } from '@features/properties/setup/components/stepStyles';
 
 export type ContractValues = {
   contract_type: 'trial' | 'formal';
@@ -34,9 +34,15 @@ export const toAmount = (value: string) => {
 export const durationOf = (values: ContractValues) =>
   values.contract_type === 'trial' ? 6 : Number(values.duration);
 
-/** La prueba siempre lleva depósito; el formal preexistente puede no tenerlo (C-18). */
-export const depositRequired = (values: ContractValues) =>
-  values.contract_type === 'trial' || values.has_deposit;
+/**
+ * Depósito: obligatorio en una renta nueva (C-08) y en prueba; el formal preexistente puede no
+ * tenerlo (C-18).
+ */
+export const depositRequired = (values: ContractValues, mode: ContractMode = 'preexisting') =>
+  mode === 'new' || values.contract_type === 'trial' || values.has_deposit;
+
+/** new: Crear contrato (C-08). preexisting: renta que ya existe (P-10 / C-18). */
+export type ContractMode = 'new' | 'preexisting';
 
 const Grid = styled.div`
   display: grid;
@@ -76,6 +82,9 @@ const Check = styled.label`
 `;
 
 type ContractFieldsProps = {
+  mode?: ContractMode;
+  /** C-08: "Ana Torres · Departamento 103, Residencial Alameda". */
+  context?: string;
   form: UseFormReturn<ContractValues>;
   failure: { title: string; body?: string; tone: 'error' | 'uncertain'; requestId?: string } | null;
   reviewing: boolean;
@@ -86,7 +95,15 @@ type ContractFieldsProps = {
  * P-10 · Contrato (C-18): fechas y condiciones reales. Duraciones de la Guía: prueba de 6 meses;
  * formal de 6, 12 o 24. El estado (Activo o Vencido) y los cobros los da la revisión del servidor.
  */
-export function ContractFields({ form, failure, reviewing, onReview }: ContractFieldsProps) {
+export function ContractFields({
+  mode = 'preexisting',
+  context,
+  form,
+  failure,
+  reviewing,
+  onReview,
+}: ContractFieldsProps) {
+  const isNew = mode === 'new';
   const {
     register,
     control,
@@ -101,8 +118,8 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
   return (
     <>
       <StepIntro>
-        <h2>Datos del contrato que ya tiene</h2>
-        <p>Escribe las fechas y condiciones reales.</p>
+        <h2>{isNew ? 'Condiciones del contrato' : 'Datos del contrato que ya tiene'}</h2>
+        <p>{isNew ? context : 'Escribe las fechas y condiciones reales.'}</p>
       </StepIntro>
       {failure ? (
         <Notice tone={failure.tone} title={failure.title} requestId={failure.requestId}>
@@ -153,7 +170,13 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
               validate: value => Boolean(value) || 'Escribe la fecha de inicio.',
             })}
           />
-          {end ? <Hint>Termina el {formatDateWithYear(end)}.</Hint> : null}
+          {end ? (
+            <Hint>
+              {isNew
+                ? `Fecha final: ${formatDateWithYear(end)}. Se calcula con la fecha de inicio y la duración.`
+                : `Termina el ${formatDateWithYear(end)}.`}
+            </Hint>
+          ) : null}
         </div>
         <TextField
           label="Renta mensual"
@@ -168,7 +191,11 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
         />
         <TextField
           label="Día de pago"
-          help="Día del mes en que vence la renta"
+          help={
+            isNew
+              ? 'Día del mes en que vence la renta. Si un mes no tiene ese día, vence el último día del mes.'
+              : 'Día del mes en que vence la renta'
+          }
           format="digits"
           maxLength={2}
           autoComplete="off"
@@ -181,7 +208,7 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
           })}
         />
       </Grid>
-      {trial ? (
+      {isNew ? null : trial ? (
         <Hint as="p">Un contrato de prueba siempre lleva depósito.</Hint>
       ) : (
         <Check>
@@ -191,24 +218,32 @@ export function ContractFields({ form, failure, reviewing, onReview }: ContractF
           </span>
         </Check>
       )}
-      {depositRequired(values) ? (
+      {depositRequired(values, mode) ? (
         <TextField
-          label="Importe del depósito"
+          label={isNew ? 'Depósito' : 'Importe del depósito'}
           format="money"
           prefix="$"
           autoComplete="off"
-          help="Se registrará como Pendiente. Después podrás registrar su pago si ya fue recibido."
+          help={
+            isNew
+              ? 'Obligatorio en una renta nueva. Se creará como Pendiente; no se copia de la renta.'
+              : 'Se registrará como Pendiente. Después podrás registrar su pago si ya fue recibido.'
+          }
           disabled={reviewing}
           error={errors.deposit_amount?.message}
           {...register('deposit_amount', {
             validate: (value, all) =>
-              !depositRequired(all) || toAmount(value) > 0 || 'Escribe el importe del depósito.',
+              !depositRequired(all, mode) ||
+              toAmount(value) > 0 ||
+              (isNew
+                ? 'Escribe el importe del depósito. Es obligatorio en una renta nueva.'
+                : 'Escribe el importe del depósito.'),
           })}
         />
       ) : null}
       <StepFooter>
         <Button onClick={onReview} loading={reviewing} loadingLabel="Revisando…">
-          Revisar renta actual
+          {isNew ? 'Revisar contrato' : 'Revisar renta actual'}
         </Button>
       </StepFooter>
     </>

@@ -17,3 +17,7 @@ export const placeName = (unitName: string, property: PlaceProperty) => {
   const { primary, separator, secondary } = placeParts(unitName, property);
   return `${primary}${separator}${secondary}`;
 };
+
+/** Nombre corto de la unidad (títulos y diálogos): "Departamento 2"; casa o bodega, "Casa Encino". */
+export const shortPlaceName = (unitName: string, property: PlaceProperty) =>
+  placeParts(unitName, property).secondary || property.name;

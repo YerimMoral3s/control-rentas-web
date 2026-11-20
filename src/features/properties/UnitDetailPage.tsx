@@ -72,6 +72,15 @@ export function UnitDetailPage() {
         unit={unit}
         name={unit.name}
         menu={[
+          // C-18: en Más acciones para no competir con Crear contrato.
+          ...(unit.status === 'available' && unit.reviewed_at
+            ? [
+                {
+                  label: 'Registrar contrato existente',
+                  onSelect: () => void navigate(`/unidades/${unit.id}/contrato-existente`),
+                },
+              ]
+            : []),
           { label: 'Editar unidad', onSelect: () => void navigate(`/unidades/${unit.id}/editar`) },
           { label: 'Eliminar unidad', danger: true, onSelect: () => setDeleting(true) },
         ]}

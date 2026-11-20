@@ -5,8 +5,9 @@ import { contractKindLine } from '@features/contracts/contractText';
 import { formatDateRange, formatDateWithYear, monthName } from '@lib/dates';
 import { formatMoney, formatPhone } from '@lib/format';
 import { media } from '@styles/theme';
-import { StepFooter, StepIntro } from '../components/stepStyles';
-import { dueText, groupRents, rentTitle } from '../currentRentText';
+import { StepFooter, StepIntro } from '@features/properties/setup/components/stepStyles';
+import { unitLabel } from './UnitPicker';
+import { dueText, groupRents, overdueSentence, rentTitle } from './contractPreviewText';
 
 const Columns = styled.div`
   display: flex;
@@ -103,6 +104,10 @@ const Charges = styled.ul`
 `;
 
 type RentReviewProps = {
+  /** new: Crear contrato (C-09). preexisting: renta actual (P-10 / C-18). */
+  mode?: 'new' | 'preexisting';
+  /** C-18: textos de "contrato existente" en vez de "renta actual" (P-10). */
+  existing?: boolean;
   preview: CreationPreview;
   tenantPhone: string | null;
   /** 409 PREVIEW_CHANGED: la revisión se actualizó y hay que confirmar de nuevo. */
@@ -119,6 +124,8 @@ type RentReviewProps = {
  * confirmación; Guardar usa su token y nunca se reenvía solo.
  */
 export function RentReview({
+  mode = 'preexisting',
+  existing = false,
   preview,
   tenantPhone,
   changed,
@@ -131,16 +138,26 @@ export function RentReview({
   const { contract, tenant, unit, deposit, new_rents: rents } = preview;
   const name = `${tenant.first_name} ${tenant.last_name}`;
   const expired = contract.status === 'expired';
-  const { single, group } = groupRents(rents);
+  const isNew = mode === 'new';
+  // Renta nueva: los cobros uno por uno, tal como los entrega la revisión (C-09).
+  const { single, group } = isNew ? { single: rents, group: null } : groupRents(rents);
   const [year, month] = preview.operational_date.split('-').map(Number) as [number, number];
   const currentMonth = monthName(year, month);
 
   return (
     <>
       <StepIntro>
-        <h2>Revisa la renta actual</h2>
+        <h2>
+          {isNew
+            ? 'Revisa el contrato'
+            : existing
+              ? 'Revisa el contrato existente'
+              : 'Revisa la renta actual'}
+        </h2>
         <p>
-          {unit.name} · {unit.property.name}
+          {isNew
+            ? 'Crear el contrato genera los cobros, pero no los marca como Pagados. Registrarás cada pago después.'
+            : `${unit.name} · ${unit.property.name}`}
         </p>
       </StepIntro>
       {changed ? (
@@ -156,7 +173,7 @@ export function RentReview({
       <Columns>
         <Block>
           <header>
-            <h3>Inquilino</h3>
+            <h3>{isNew ? 'Inquilino y unidad' : 'Inquilino'}</h3>
             <Button variant="tertiary" onClick={onChangeTenant} disabled={saving}>
               Cambiar
             </Button>
@@ -168,6 +185,12 @@ export function RentReview({
               <>
                 <dt>Teléfono</dt>
                 <dd>{formatPhone(tenantPhone)}</dd>
+              </>
+            ) : null}
+            {isNew ? (
+              <>
+                <dt>Unidad</dt>
+                <dd>{unitLabel(unit)}</dd>
               </>
             ) : null}
           </Facts>
@@ -196,7 +219,7 @@ export function RentReview({
         </Block>
         {deposit ? (
           <Block>
-            <h3>Depósito anterior</h3>
+            <h3>{isNew ? 'Depósito' : 'Depósito anterior'}</h3>
             <Facts>
               <dt>Importe</dt>
               <dd>{formatMoney(deposit.amount)}</dd>
@@ -205,14 +228,17 @@ export function RentReview({
                 <StatusBadge status={deposit.status} compact />
               </dd>
             </Facts>
-            <p>
-              Se registrará como Pendiente. Después podrás registrar su pago si ya fue recibido.
-            </p>
+            {isNew ? null : (
+              <p>
+                Se registrará como Pendiente. Después podrás registrar su pago si ya fue recibido.
+              </p>
+            )}
           </Block>
         ) : null}
         <Block>
           <h3>Cobros que se crearán · {preview.summary.new_rents}</h3>
-          {expired && rents.length === 0 ? (
+          {isNew && overdueSentence(rents) ? <p>{overdueSentence(rents)}</p> : null}
+          {!isNew && expired && rents.length === 0 ? (
             <Notice tone="warning" title={`Venció el ${formatDateWithYear(contract.end_date)}`}>
               {name} sigue rentando; la unidad quedará Ocupada. No se crean cobros porque su fecha
               de término ya pasó. Después podrás usar Agregar renta o Continuar contrato desde el
@@ -225,7 +251,7 @@ export function RentReview({
                   <Charge key={rent.period_key}>
                     <strong>{rentTitle(rent.period_key)}</strong>
                     <b>{formatMoney(rent.amount)}</b>
-                    <small>{dueText(rent)}</small>
+                    <small>{dueText(rent, preview.operational_date)}</small>
                     <span>
                       <StatusBadge status={rent.status} compact />
                     </span>
@@ -244,20 +270,22 @@ export function RentReview({
                   </Charge>
                 ) : null}
               </Charges>
-              <p>
-                Empiezan en {currentMonth}, el mes en que la registras. No se agregan meses
-                anteriores. Si ya te pagó {currentMonth}, registra el pago después desde el cobro.
-              </p>
+              {isNew ? null : (
+                <p>
+                  Empiezan en {currentMonth}, el mes en que la registras. No se agregan meses
+                  anteriores. Si ya te pagó {currentMonth}, registra el pago después desde el cobro.
+                </p>
+              )}
             </>
           )}
         </Block>
       </Columns>
       <StepFooter>
         <Button onClick={onSave} loading={saving} disabled={failure?.tone === 'uncertain'}>
-          Guardar renta actual
+          {isNew ? 'Crear contrato' : existing ? 'Registrar contrato' : 'Guardar renta actual'}
         </Button>
         <Button variant="secondary" onClick={onChangeData} disabled={saving}>
-          Cambiar datos
+          {isNew ? 'Cambiar condiciones' : 'Cambiar datos'}
         </Button>
       </StepFooter>
     </>

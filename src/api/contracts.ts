@@ -183,3 +183,226 @@ export const createPreexistingContract = (
     data: body,
     operation: 'contract_preexisting_create',
   });
+
+/** C-08: renta nueva. El fin lo calcula BACK; el depósito es obligatorio. */
+export type NewContractInput = Omit<PreexistingContractInput, 'end_date'>;
+
+/** Resultado real del alta (C-10): cobros persistidos y resumen. */
+export type CreatedContract = Contract & {
+  generation_summary: CreationPreview['summary'];
+  created_payments: Array<{
+    id: string;
+    contract_id: string;
+    payment_type: string;
+    period_key: string;
+    amount: string;
+    due_date: string;
+    status: 'pending' | 'overdue' | 'paid' | 'cancelled';
+  }>;
+};
+
+/** POST /v1/contracts/preview — no crea nada. */
+export const previewContract = (body: NewContractInput) =>
+  apiRequest<CreationPreview>({
+    method: 'POST',
+    url: '/contracts/preview',
+    data: body,
+    operation: 'contract_preview',
+  });
+
+/** POST /v1/contracts — confirma con el token de la revisión (409 PREVIEW_CHANGED si cambió). */
+export const createContract = (body: NewContractInput & { preview_token: string }) =>
+  apiRequest<CreatedContract>({
+    method: 'POST',
+    url: '/contracts',
+    data: body,
+    operation: 'contract_create',
+  });
+
+/** C-11: nuevas condiciones formales de la continuidad (inicio = día siguiente al fin anterior). */
+export type ContinuationInput = {
+  previous_contract_id: string;
+  duration_months: number;
+  rent_amount: number;
+  fixed_due_day: number;
+};
+
+/** C-12 / C-14: revisión del servidor de la continuidad (RenewalPreview). FRONT no calcula. */
+export type RenewalPreview = {
+  previous_contract: { id: string };
+  contract: {
+    contract_type: 'formal';
+    duration_months: number;
+    rent_amount: string;
+    fixed_due_day: number;
+    start_date: string;
+    end_date: string;
+    status: ContractStatus;
+  };
+  operational_date: string;
+  covered_months: Array<{
+    period_key: string;
+    payment: {
+      id: string;
+      origin_contract: { id: string };
+      status: 'pending' | 'overdue' | 'paid' | 'cancelled';
+      amount: string;
+      due_date: string;
+      generated_automatically: boolean;
+    };
+  }>;
+  new_rents: Array<{
+    period_key: string;
+    amount: string;
+    due_date: string;
+    status: 'pending' | 'overdue';
+  }>;
+  deposit: ContractDeposit | null;
+  summary: {
+    total_months: number;
+    covered_months: number;
+    new_rents: number;
+    new_rents_amount: string;
+  };
+  preview_token: string;
+};
+
+/** C-13: contrato nuevo de la continuidad con su resumen real. */
+export type RenewedContract = Contract & { renewal_summary: RenewalPreview['summary'] };
+
+/** POST /v1/contracts/formal-continuations/preview — no escribe. */
+export const previewContinuation = (body: ContinuationInput) =>
+  apiRequest<RenewalPreview>({
+    method: 'POST',
+    url: '/contracts/formal-continuations/preview',
+    data: body,
+    operation: 'contract_continuation_preview',
+  });
+
+/** POST /v1/contracts/formal-continuations — 409 RENEWAL_PREVIEW_CHANGED si la revisión cambió. */
+export const createContinuation = (body: ContinuationInput & { preview_token: string }) =>
+  apiRequest<RenewedContract>({
+    method: 'POST',
+    url: '/contracts/formal-continuations',
+    data: body,
+    operation: 'contract_continuation_create',
+  });
+
+/** C-15: solo renta y día de pago; al menos uno. */
+export type ConditionsInput = { rent_amount?: number; fixed_due_day?: number };
+
+type RentState = {
+  amount: string;
+  due_date: string;
+  status: 'pending' | 'overdue' | 'paid' | 'cancelled';
+};
+
+/** C-16: antes y después, y las rentas existentes que realmente cambiarán (FR-02). */
+export type ConditionsPreview = {
+  contract_id: string;
+  operational_date: string;
+  conditions: {
+    before: { rent_amount: string; fixed_due_day: number };
+    after: { rent_amount: string; fixed_due_day: number };
+  };
+  changed_rents: Array<{
+    id: string;
+    contract_id: string;
+    period_key: string;
+    generated_automatically: boolean;
+    before: RentState;
+    after: RentState;
+  }>;
+  summary: { changed_rents: number; amount_before: string; amount_after: string };
+  preview_token: string;
+};
+
+export type UpdatedContract = Contract & { update_summary: ConditionsPreview['summary'] };
+
+/** POST /v1/contracts/:id/conditions/preview — no modifica nada. */
+export const previewConditions = ({
+  contractId,
+  changes,
+}: {
+  contractId: string;
+  changes: ConditionsInput;
+}) =>
+  apiRequest<ConditionsPreview>({
+    method: 'POST',
+    url: `/contracts/${encodeURIComponent(contractId)}/conditions/preview`,
+    data: changes,
+    operation: 'contract_conditions_preview',
+  });
+
+/** PATCH /v1/contracts/:id — confirma con el token (409 PREVIEW_CHANGED si cambió). */
+export const updateContract = ({
+  contractId,
+  changes,
+  previewToken,
+}: {
+  contractId: string;
+  changes: ConditionsInput;
+  previewToken: string;
+}) =>
+  apiRequest<UpdatedContract>({
+    method: 'PATCH',
+    url: `/contracts/${encodeURIComponent(contractId)}`,
+    data: { ...changes, preview_token: previewToken },
+    operation: 'contract_update',
+  });
+
+/** FE-33: lo que se cancela (o se canceló) al terminar y lo que queda pendiente. */
+export type TerminationSummary = {
+  as_of_date: string;
+  is_early: boolean;
+  cancelled_rents: Array<{ payment_id: string; period_key: string; amount: string }>;
+  cancelled_rents_count: number;
+  cancelled_rents_amount: string;
+  cancelled_additional_charges: Array<{
+    payment_id: string;
+    concept: string | null;
+    due_date: string;
+    amount: string;
+  }>;
+  cancelled_additional_charges_count: number;
+  cancelled_additional_charges_amount: string;
+  cancelled_count: number;
+  cancelled_amount: string;
+  retained_payments: {
+    scope: 'rental_continuity';
+    unpaid_count: number;
+    unpaid_amount: string;
+    overdue_count: number;
+    overdue_amount: string;
+  };
+};
+
+export type TerminationPreview = {
+  contract: { id: string };
+  unit: { id: string };
+  termination_summary: TerminationSummary;
+  preview_token: string;
+};
+
+/** POST /v1/contracts/:id/terminate/preview — no modifica nada (C-17). */
+export const previewTermination = (contractId: string) =>
+  apiRequest<TerminationPreview>({
+    method: 'POST',
+    url: `/contracts/${encodeURIComponent(contractId)}/terminate/preview`,
+    operation: 'contract_terminate_preview',
+  });
+
+/** POST /v1/contracts/:id/terminate — Terminar y desocupar con el token de la revisión (C-17). */
+export const terminateContract = ({
+  contractId,
+  previewToken,
+}: {
+  contractId: string;
+  previewToken: string;
+}) =>
+  apiRequest<Contract & { termination_summary: TerminationSummary }>({
+    method: 'POST',
+    url: `/contracts/${encodeURIComponent(contractId)}/terminate`,
+    data: { preview_token: previewToken },
+    operation: 'contract_terminate',
+  });

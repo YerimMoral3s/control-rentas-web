@@ -3,6 +3,10 @@ import { AppErrorScreen } from '@features/pending/AppErrorScreen';
 import { MorePage } from '@features/pending/MorePage';
 import { PendingScreen } from '@features/pending/PendingScreen';
 import { LoginPage } from '@features/access/LoginPage';
+import { ContinueContractPage } from '@features/contracts/continue/ContinueContractPage';
+import { CreateContractPage } from '@features/contracts/create/CreateContractPage';
+import { EditContractPage } from '@features/contracts/edit/EditContractPage';
+import { RegisterExistingContractPage } from '@features/contracts/existing/RegisterExistingContractPage';
 import { ContractDetailPage } from '@features/contracts/ContractDetailPage';
 import { ContractsPage } from '@features/contracts/ContractsPage';
 import { ExpenseDetailPage } from '@features/expenses/ExpenseDetailPage';
@@ -61,10 +65,14 @@ export const router = createBrowserRouter([
       },
       { path: 'propiedades/:propertyId/configurar/:step?', element: <PropertySetupPage /> },
       { path: 'contratos', element: <ContractsPage /> },
+      { path: 'contratos/nuevo', element: <CreateContractPage /> },
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },
       { path: 'contratos/:contractId', element: <ContractDetailPage /> },
+      { path: 'contratos/:contractId/editar', element: <EditContractPage /> },
+      { path: 'contratos/:contractId/continuar', element: <ContinueContractPage /> },
       { path: 'unidades/:unitId', element: <UnitDetailPage /> },
       { path: 'unidades/:unitId/editar', element: <UnitEditPage /> },
+      { path: 'unidades/:unitId/contrato-existente', element: <RegisterExistingContractPage /> },
       { path: 'mas', element: <MorePage /> },
       ...devRoutes,
       { path: '*', element: <PendingScreen title="No encontramos esta página" /> },

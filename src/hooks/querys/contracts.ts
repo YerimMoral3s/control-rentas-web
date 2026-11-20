@@ -1,9 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import {
+  createContinuation,
+  createContract,
   createPreexistingContract,
   getContract,
   getContracts,
   getExpiringContracts,
+  terminateContract,
+  updateContract,
+  previewConditions,
+  previewContinuation,
+  previewTermination,
+  previewContract,
   previewPreexistingContract,
   type ContractListParams,
 } from '@api/contracts';
@@ -59,3 +67,32 @@ export const usePreviewPreexistingContract = () =>
 /** P-10 / C-18: guardar la renta actual con el token de su revisión. */
 export const useCreatePreexistingContract = () =>
   useMutation({ retry: false, mutationFn: createPreexistingContract });
+
+/** C-09: revisión del servidor de una renta nueva. */
+export const usePreviewContract = () => useMutation({ retry: false, mutationFn: previewContract });
+
+/** C-09: crear el contrato con el token de su revisión. */
+export const useCreateContract = () => useMutation({ retry: false, mutationFn: createContract });
+
+/** C-12: revisión de la continuidad. */
+export const usePreviewContinuation = () =>
+  useMutation({ retry: false, mutationFn: previewContinuation });
+
+/** C-12 / C-14: confirmar la continuidad con el token de su revisión. */
+export const useCreateContinuation = () =>
+  useMutation({ retry: false, mutationFn: createContinuation });
+
+/** C-16: rentas que cambiarán con la nueva renta o día de pago. */
+export const usePreviewConditions = () =>
+  useMutation({ retry: false, mutationFn: previewConditions });
+
+/** C-16: guardar los cambios con el token de su revisión. */
+export const useUpdateContract = () => useMutation({ retry: false, mutationFn: updateContract });
+
+/** C-17: qué se cancelaría al terminar (FE-33). */
+export const usePreviewTermination = () =>
+  useMutation({ retry: false, mutationFn: previewTermination });
+
+/** C-17: Terminar y desocupar. */
+export const useTerminateContract = () =>
+  useMutation({ retry: false, mutationFn: terminateContract });

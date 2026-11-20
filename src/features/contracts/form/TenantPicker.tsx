@@ -8,7 +8,7 @@ import { useCreateTenant } from '@hooks/querys/tenants';
 import { useInvalidateEvents } from '@hooks/querys/useInvalidateEvents';
 import { formatPhone } from '@lib/format';
 import { media } from '@styles/theme';
-import { StepIntro, StickyStepFooter } from '../components/stepStyles';
+import { StepIntro, StickyStepFooter } from '@features/properties/setup/components/stepStyles';
 
 /**
  * En computadora, lista con su propio scroll; en celular crece con la página (un scroll dentro
@@ -109,6 +109,9 @@ const nameParts = (term: string) => {
 
 type TenantPickerProps = {
   unitName: string;
+  /** Título del paso; por defecto "¿Quién renta <unidad>?" (P-10). */
+  question?: string;
+  continueLabel?: string;
   selectedId: string | null;
   onSelect: (tenant: Tenant) => void;
   onContinue: () => void;
@@ -118,7 +121,14 @@ type TenantPickerProps = {
  * P-10 · Inquilino: busca en el catálogo con MiniSearch (nombre, apellidos, alias o teléfono) o
  * crea uno nuevo (T-07) sin perder el avance; al crearlo queda seleccionado.
  */
-export function TenantPicker({ unitName, selectedId, onSelect, onContinue }: TenantPickerProps) {
+export function TenantPicker({
+  unitName,
+  question = `¿Quién renta ${unitName}?`,
+  continueLabel = 'Continuar con su contrato',
+  selectedId,
+  onSelect,
+  onContinue,
+}: TenantPickerProps) {
   const events = useInvalidateEvents();
   const create = useCreateTenant();
   const [term, setTerm] = useState('');
@@ -162,7 +172,7 @@ export function TenantPicker({ unitName, selectedId, onSelect, onContinue }: Ten
   return (
     <>
       <StepIntro>
-        <h2>¿Quién renta {unitName}?</h2>
+        <h2>{question}</h2>
       </StepIntro>
       {created ? (
         <Notice tone="success" title="Inquilino agregado" onClose={() => setCreated(null)}>
@@ -232,7 +242,7 @@ export function TenantPicker({ unitName, selectedId, onSelect, onContinue }: Ten
             onContinue();
           }}
         >
-          Continuar con su contrato
+          {continueLabel}
         </Button>
       </StickyStepFooter>
     </>

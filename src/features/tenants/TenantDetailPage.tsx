@@ -3,7 +3,6 @@ import { useParams } from 'react-router';
 import styled from 'styled-components';
 import {
   ActionMenu,
-  Button,
   ButtonLink,
   Notice,
   ReturnLink,
@@ -146,15 +145,14 @@ export function TenantDetailPage() {
             </div>
           ) : null}
         </Contact>
-        {/* Crear contrato es de la fase 5: visible pero deshabilitado, sin simular. */}
         <Actions>
-          <Button
+          {/* C-07 con el inquilino precargado. */}
+          <ButtonLink
             variant={renting ? 'secondary' : 'primary'}
-            disabled
-            title="Disponible próximamente"
+            to={`/contratos/nuevo?inquilino=${tenant.id}`}
           >
             Crear contrato
-          </Button>
+          </ButtonLink>
           <ButtonLink variant="neutral" to={`/inquilinos/${tenant.id}/editar`}>
             Editar
           </ButtonLink>

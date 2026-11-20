@@ -156,12 +156,14 @@ const Mark = styled.span<{ $done: boolean; $current: boolean }>`
     $done || $current ? theme.color.white : theme.color.neutral600};
 `;
 
-type SetupLayoutProps = {
-  step: SetupStep;
+type SetupLayoutProps<K extends string> = {
+  step: NoInfer<K>;
+  /** Pasos del recorrido; por defecto, los 4 de configurar una propiedad. */
+  steps?: ReadonlyArray<{ key: K; label: string }>;
   /** Pasos ya terminados (se pueden consultar con "Ver"). */
-  done: Partial<Record<SetupStep, boolean>>;
+  done: Partial<Record<NoInfer<K>, boolean>>;
   /** Ruta de cada paso; sin ruta (alta nueva) el paso no se puede abrir todavía. */
-  stepTo?: (step: SetupStep) => string;
+  stepTo?: (step: NoInfer<K>) => string;
   title: string;
   subtitle?: string;
   back: { label: string; onClick: () => void };
@@ -173,9 +175,10 @@ type SetupLayoutProps = {
   children: ReactNode;
 };
 
-/** Marco del recorrido: pasos, título de la propiedad y salida segura. */
-export function SetupLayout({
+/** Marco de un recorrido por pasos (configurar propiedad, crear contrato): pasos, título y salida segura. */
+export function SetupLayout<K extends string = SetupStep>({
   step,
+  steps = SETUP_STEPS as unknown as ReadonlyArray<{ key: K; label: string }>,
   done,
   stepTo,
   title,
@@ -185,9 +188,9 @@ export function SetupLayout({
   saving,
   property,
   children,
-}: SetupLayoutProps) {
+}: SetupLayoutProps<K>) {
   const [deleting, setDeleting] = useState(false);
-  const index = SETUP_STEPS.findIndex(item => item.key === step);
+  const index = steps.findIndex(item => item.key === step);
   const saveExit = onSaveExit ? (
     <Button variant="tertiary" onClick={onSaveExit} loading={saving} loadingLabel="Guardando…">
       Guardar y salir
@@ -213,7 +216,7 @@ export function SetupLayout({
         </MobileEnd>
       </MobileBar>
       <MobileStep>
-        Paso {index + 1} de {SETUP_STEPS.length} <span>· {SETUP_STEPS[index]?.label}</span>
+        Paso {index + 1} de {steps.length} <span>· {steps[index]?.label}</span>
       </MobileStep>
       <Head>
         <h1>{title}</h1>
@@ -223,7 +226,7 @@ export function SetupLayout({
         <Steps aria-label="Pasos de la configuración">
           <h2>Pasos</h2>
           <ol>
-            {SETUP_STEPS.map((item, position) => {
+            {steps.map((item, position) => {
               const current = item.key === step;
               const isDone = Boolean(done[item.key]) && !current;
               return (

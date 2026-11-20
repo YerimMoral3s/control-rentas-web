@@ -109,6 +109,7 @@ function SingleUnitProperty({
   propertyMenu: ActionMenuItem[];
 }) {
   const units = usePropertyUnits(property.id);
+  const navigate = useNavigate();
   const unit = units.items[0];
 
   if (units.isPending) return <Skeleton $height="160px" $radius={tokens.radius.card} />;
@@ -127,7 +128,21 @@ function SingleUnitProperty({
       </DetailHeader>
       <IncompleteNotice property={property} />
       {unit ? (
-        <UnitBody unit={unit} name={property.name} menu={propertyMenu} />
+        <UnitBody
+          unit={unit}
+          name={property.name}
+          menu={[
+            ...(unit.status === 'available' && unit.reviewed_at
+              ? [
+                  {
+                    label: 'Registrar contrato existente',
+                    onSelect: () => void navigate(`/unidades/${unit.id}/contrato-existente`),
+                  },
+                ]
+              : []),
+            ...propertyMenu,
+          ]}
+        />
       ) : (
         <MutedText>Esta propiedad aún no tiene su unidad.</MutedText>
       )}

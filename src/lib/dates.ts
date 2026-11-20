@@ -123,3 +123,9 @@ export const contractEndDate = (start: string, months: number) => {
   end.setUTCDate(end.getUTCDate() - 1);
   return end.toISOString().slice(0, 10);
 };
+
+/** "2026-09-30" → "2026-10-01": inicio de una continuidad (C-11), el día siguiente al fin anterior. */
+export const nextDay = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
+  return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+};
