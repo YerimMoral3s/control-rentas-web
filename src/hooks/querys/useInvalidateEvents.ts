@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query';
 import { ContractsQueryKeys } from './contracts';
 import { DashboardQueryKeys } from './dashboard';
+import { ExpensesQueryKeys } from './expenses';
 import { MovementsQueryKeys } from './movements';
 import { PaymentsQueryKeys } from './payments';
 import { PropertiesQueryKeys } from './properties';
@@ -34,6 +35,31 @@ const buildEvents = (queryClient: QueryClient) => {
         TenantsQueryKeys.catalog,
         TenantsQueryKeys.detail(tenantId),
         DashboardQueryKeys.root,
+      ]),
+    /**
+     * Y-04 / Y-05: un cobro se pagó o se corrigió. Cambian el cobro, Pagos por atender, el resumen
+     * del contrato, los pagos atrasados del inquilino, Inicio y Movimientos.
+     */
+    paymentChanged: () =>
+      invalidate([
+        PaymentsQueryKeys.root,
+        ContractsQueryKeys.root,
+        TenantsQueryKeys.root,
+        DashboardQueryKeys.root,
+        MovementsQueryKeys.root,
+      ]),
+    /**
+     * Y-16 a Y-18: devolución de depósito registrada, corregida o eliminada. Cambian el depósito, el
+     * contrato, los gastos de la unidad, Movimientos, Inicio y el adeudo del inquilino.
+     */
+    depositRefundChanged: () =>
+      invalidate([
+        PaymentsQueryKeys.root,
+        ContractsQueryKeys.root,
+        ExpensesQueryKeys.root,
+        MovementsQueryKeys.root,
+        DashboardQueryKeys.root,
+        TenantsQueryKeys.root,
       ]),
     /** Propiedad nueva (incompleta): aparece primero en Propiedades. */
     propertyCreated: () => invalidate([PropertiesQueryKeys.root]),

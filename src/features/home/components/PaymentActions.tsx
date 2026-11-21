@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import type { Payment } from '@api/payments';
-import { actionLinkStyle, Button, Icon } from '@components';
+import { actionLinkStyle, Icon } from '@components';
 import { whatsappUrl } from '@lib/whatsapp';
 import { tenantName, whatsappMessage } from '@lib/paymentText';
 
@@ -28,22 +28,4 @@ export function PaymentWhatsApp({ payment, today }: PaymentActionProps) {
   );
 }
 
-/** Registrar pago se conecta en la fase 6; mientras tanto se muestra deshabilitado, sin simular. */
-export function RegisterPaymentButton({
-  payment,
-  fullWidth,
-}: {
-  payment: Payment;
-  fullWidth?: boolean;
-}) {
-  return (
-    <Button
-      fullWidth={fullWidth}
-      disabled
-      title="Disponible próximamente"
-      aria-label={`Registrar pago de ${tenantName(payment.tenant)}`}
-    >
-      Registrar pago
-    </Button>
-  );
-}
+export { RegisterPaymentButton } from '@features/payments/actions/RegisterPaymentButton';

@@ -143,7 +143,8 @@ const Bar = styled.div`
 
 const Legend = styled.div`
   display: flex;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 4px 14px;
   font-size: 13px;
   line-height: 18px;
   font-weight: 600;
@@ -258,6 +259,16 @@ const BalanceText = styled.span`
   }
 `;
 
+/** Aclaración visible: el resumen solo cuenta rentas; Pagos por atender reúne todos los cobros. */
+const Scope = styled.p`
+  margin: 0;
+  padding: 10px 16px 12px;
+  border-top: 1px solid ${({ theme }) => theme.color.neutral200};
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.color.neutral600};
+`;
+
 type MonthSummaryProps = {
   /** Nombre del mes como lo entrega la API, por ejemplo "octubre". */
   monthName: string;
@@ -290,7 +301,7 @@ export function MonthSummary({
     () => window.matchMedia(`(min-width: ${tokens.breakpoint.desktop})`).matches,
   );
   const contentId = useId();
-  const title = `Rentas de ${monthName}`;
+  const title = `Resumen de rentas · ${monthName.charAt(0).toUpperCase()}${monthName.slice(1)}`;
   const cue = open ? 'Ocultar desglose' : 'Ver desglose';
   const expensesLabel = Number(expenses) > 0 ? `−${formatMoney(expenses)}` : formatMoney(expenses);
 
@@ -319,7 +330,7 @@ export function MonthSummary({
         <BarBlock>
           <Bar
             role="img"
-            aria-label={`Pagado ${formatMoney(paid)}, Pendiente ${formatMoney(pending)}, Vencido ${formatMoney(overdue)}`}
+            aria-label={`Rentas pagadas ${formatMoney(paid)}, Rentas pendientes ${formatMoney(pending)}, Rentas vencidas ${formatMoney(overdue)}`}
           >
             <span style={{ flex: toNumber(paid), background: tokens.color.success }} />
             <span style={{ flex: toNumber(pending), background: tokens.color.warningBar }} />
@@ -328,15 +339,15 @@ export function MonthSummary({
           <Legend aria-hidden="true">
             <span>
               <Swatch $bg={tokens.color.success} />
-              Pagado
+              Rentas pagadas
             </span>
             <span>
               <Swatch $bg={tokens.color.warningBar} />
-              Pendiente
+              Rentas pendientes
             </span>
             <span>
               <Swatch $bg={overdueStripe} />
-              Vencido
+              Rentas vencidas
             </span>
           </Legend>
         </BarBlock>
@@ -346,21 +357,21 @@ export function MonthSummary({
               <Row>
                 <RowLabel $color={tokens.color.success}>
                   <Icon name="check" size={18} strokeWidth={2.4} />
-                  Pagado
+                  Rentas pagadas
                 </RowLabel>
                 <Amount>{formatMoney(paid)}</Amount>
               </Row>
               <Row>
                 <RowLabel $color={tokens.color.warning}>
                   <Icon name="clock" size={18} strokeWidth={2.4} />
-                  Pendiente
+                  Rentas pendientes
                 </RowLabel>
                 <Amount>{formatMoney(pending)}</Amount>
               </Row>
               <Row>
                 <RowLabel $color={tokens.color.danger}>
                   <Icon name="alert" size={18} strokeWidth={2.4} />
-                  Vencido
+                  Rentas vencidas
                 </RowLabel>
                 <Amount>{formatMoney(overdue)}</Amount>
               </Row>
@@ -379,6 +390,7 @@ export function MonthSummary({
           <BigAmount>{formatMoney(balance)}</BigAmount>
         </Balance>
       </Content>
+      <Scope>No incluye depósitos ni cargos adicionales.</Scope>
     </Section>
   );
 }

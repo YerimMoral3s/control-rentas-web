@@ -19,7 +19,7 @@ import {
 import { useContract } from '@hooks/querys/contracts';
 import { formatDateRange, formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
-import { placeName } from '@lib/place';
+import { placeName, shortPlaceName } from '@lib/place';
 import { useResultNotice } from '@lib/useResultNotice';
 import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { ContractPayments } from './components/ContractPayments';
@@ -103,8 +103,6 @@ const Data = styled.dl`
   }
 `;
 
-const comingSoon = { disabled: true, title: 'Disponible próximamente' } as const;
-
 const tenantName = (contract: Contract) =>
   `${contract.tenant.first_name} ${contract.tenant.last_name}`;
 
@@ -113,8 +111,9 @@ function StatusNotice({ contract }: { contract: Contract }) {
   if (contract.status === 'expired' && contract.is_current) {
     return (
       <Notice tone="warning" title={`Venció el ${formatDateWithYear(contract.end_date)}.`}>
-        {contract.tenant.first_name} sigue rentando {contract.unit.name} hasta que continúes o
-        termines el contrato.
+        {contract.tenant.first_name} sigue rentando{' '}
+        {shortPlaceName(contract.unit.name, contract.property)} hasta que continúes o termines el
+        contrato.
       </Notice>
     );
   }
@@ -171,9 +170,9 @@ function ContractActions({ contract }: { contract: Contract }) {
         {contract.next_contract ? null : (
           <ButtonLink to={`/contratos/${contract.id}/continuar`}>Continuar contrato</ButtonLink>
         )}
-        <Button variant="secondary" {...comingSoon}>
+        <ButtonLink variant="secondary" to={`/contratos/${contract.id}/agregar-renta`}>
           Agregar renta
-        </Button>
+        </ButtonLink>
         <Button variant="secondary" onClick={() => setTerminating(true)}>
           Terminar y desocupar
         </Button>
@@ -185,9 +184,9 @@ function ContractActions({ contract }: { contract: Contract }) {
   if (contract.status === 'active' && contract.is_current) {
     return (
       <Actions>
-        <Button variant="secondary" icon="plus" {...comingSoon}>
+        <ButtonLink variant="secondary" icon="plus" to={`/contratos/${contract.id}/agregar-cargo`}>
           Agregar cargo
-        </Button>
+        </ButtonLink>
         <ActionMenu
           items={[
             edit,
@@ -205,9 +204,9 @@ function ContractActions({ contract }: { contract: Contract }) {
   ) {
     return (
       <Actions>
-        <Button variant="secondary" {...comingSoon}>
+        <ButtonLink variant="secondary" to={`/contratos/${contract.id}/devolver-deposito`}>
           Devolver depósito
-        </Button>
+        </ButtonLink>
       </Actions>
     );
   }

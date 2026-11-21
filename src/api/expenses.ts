@@ -60,3 +60,29 @@ export const getExpense = (expenseId: string, signal?: AbortSignal) =>
     signal,
     operation: 'expense_detail',
   });
+
+/** POST /v1/expenses/deposit-refunds — devolución con la fecha de hoy del servidor (Y-16). */
+export const createDepositRefund = (body: { deposit_payment_id: string; amount: number }) =>
+  apiRequest<Expense>({
+    method: 'POST',
+    url: '/expenses/deposit-refunds',
+    data: body,
+    operation: 'deposit_refund_create',
+  });
+
+/** PATCH /v1/expenses/:id — en una devolución solo cambia el importe (Y-17). */
+export const updateRefundAmount = ({ expenseId, amount }: { expenseId: string; amount: number }) =>
+  apiRequest<Expense>({
+    method: 'PATCH',
+    url: `/expenses/${encodeURIComponent(expenseId)}`,
+    data: { amount },
+    operation: 'deposit_refund_update',
+  });
+
+/** PATCH /v1/expenses/:id/deactivate — baja lógica; se conserva el registro (Y-17). */
+export const deactivateExpense = (expenseId: string) =>
+  apiRequest<{ id: string; status: 'inactive'; deactivated_at: string | null }>({
+    method: 'PATCH',
+    url: `/expenses/${encodeURIComponent(expenseId)}/deactivate`,
+    operation: 'expense_deactivate',
+  });
