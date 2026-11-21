@@ -62,7 +62,7 @@ const Note = styled.span`
 `;
 
 /** Depósito propio o heredado de un contrato anterior; la devolución se muestra aparte. */
-function DepositBox({ contract }: { contract: Contract }) {
+function DepositBox({ contract, actions }: { contract: Contract; actions: boolean }) {
   const deposit = contract.deposit;
   if (!deposit) {
     return (
@@ -86,9 +86,23 @@ function DepositBox({ contract }: { contract: Contract }) {
         <Note>
           Se devolvieron {formatMoney(deposit.refund.amount)} el{' '}
           {formatDateWithYear(deposit.refund.expense_date)}.
+          {actions ? (
+            <>
+              {' '}
+              <Link to={`/gastos/${deposit.refund.id}`}>Ver devolución</Link>
+            </>
+          ) : null}
         </Note>
       ) : deposit.status === 'paid' ? (
-        <Note>Aún no se ha devuelto.</Note>
+        <Note>
+          Aún no se ha devuelto.
+          {actions ? (
+            <>
+              {' '}
+              <Link to={`/contratos/${contract.id}/devolver-deposito`}>Devolver depósito</Link>
+            </>
+          ) : null}
+        </Note>
       ) : null}
       {inherited ? (
         <Note>
@@ -154,7 +168,8 @@ export function ContractSummaryBlocks({
           </Box>
         </>
       )}
-      <DepositBox contract={contract} />
+      {/* Y-14 / Y-15: devolver o ver la devolución desde el contrato (no en la vista compacta). */}
+      <DepositBox contract={contract} actions={!compact} />
     </Grid>
   );
 }

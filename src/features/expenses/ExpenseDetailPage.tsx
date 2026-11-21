@@ -1,17 +1,23 @@
-import { Link, useParams } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Expense } from '@api/expenses';
 import {
   ActionLink,
+  ActionMenu,
   Button,
   DetailSection,
   Icon,
+  Notice,
   ReturnLink,
   SectionError,
   Skeleton,
   StateMessage,
 } from '@components';
 import { useExpense } from '@hooks/querys/expenses';
+import { usePayment } from '@hooks/querys/payments';
+import { withResult, useResultNotice, type ResultMessage } from '@lib/useResultNotice';
+import { DeleteRefundDialog, EditRefundDialog } from '@features/payments/deposits/RefundDialogs';
 import { formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { expenseTypeLabel } from '@lib/labels';
@@ -134,6 +140,11 @@ const target = (expense: Expense) =>
 export function ExpenseDetailPage() {
   const { expenseId } = useParams();
   const query = useExpense(expenseId);
+  const navigate = useNavigate();
+  const [dialog, setDialog] = useState<'edit' | 'delete' | null>(null);
+  const { result, dismiss } = useResultNotice();
+  // Límite de la devolución: el depósito recibido.
+  const deposit = usePayment(query.data?.data.deposit_payment?.id);
   const back = <ReturnLink to="/movimientos" label="Movimientos" />;
 
   if (query.isPending) {
@@ -186,23 +197,70 @@ export function ExpenseDetailPage() {
         <strong>−{formatMoney(expense.amount)}</strong>
       </AmountBox>
 
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
+
       <Actions>
         {refund ? (
-          <Button variant="secondary" {...comingSoon}>
-            Editar importe
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => setDialog('edit')}>
+              Editar importe
+            </Button>
+            <ActionMenu
+              items={[
+                {
+                  label: 'Eliminar devolución',
+                  danger: true,
+                  onSelect: () => setDialog('delete'),
+                },
+              ]}
+            />
+          </>
         ) : (
-          <Button variant="secondary" {...comingSoon}>
-            Editar gasto
-          </Button>
+          <>
+            {/* Editar y eliminar gastos llegan con la fase 7. */}
+            <Button variant="secondary" {...comingSoon}>
+              Editar gasto
+            </Button>
+            <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
+              <Icon name="more" size={20} />
+            </Button>
+          </>
         )}
-        <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
-          <Icon name="more" size={20} />
-        </Button>
         {expense.deposit_payment ? (
           <ActionLink to={`/cobros/${expense.deposit_payment.id}`}>Ver depósito</ActionLink>
         ) : null}
       </Actions>
+
+      {refund ? (
+        <>
+          <EditRefundDialog
+            refund={expense}
+            depositAmount={deposit.data?.data.amount ?? null}
+            open={dialog === 'edit'}
+            onClose={() => setDialog(null)}
+            onDone={(message: ResultMessage) =>
+              void navigate('.', { replace: true, state: withResult(message) })
+            }
+          />
+          <DeleteRefundDialog
+            refund={expense}
+            depositAmount={deposit.data?.data.amount ?? null}
+            open={dialog === 'delete'}
+            onClose={() => setDialog(null)}
+            onDone={(message: ResultMessage) =>
+              // La devolución eliminada ya no se consulta aquí: se vuelve al contrato.
+              void navigate(
+                expense.related_contract_id ? `/contratos/${expense.related_contract_id}` : '/',
+                { replace: true, state: withResult(message) },
+              )
+            }
+          />
+        </>
+      ) : null}
 
       <DetailSection title="Detalle">
         <Data>

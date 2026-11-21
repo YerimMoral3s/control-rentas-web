@@ -18,13 +18,15 @@ describe('MonthSummary', () => {
   it('en celular inicia comprimido y la cabecera completa abre el desglose', async () => {
     renderWithTheme(<MonthSummary {...props} />);
 
-    const header = screen.getByRole('button', { name: 'Rentas de octubre, Ver desglose' });
+    const header = screen.getByRole('button', {
+      name: 'Resumen de rentas · Octubre, Ver desglose',
+    });
     expect(header).toHaveAttribute('aria-expanded', 'false');
 
     await userEvent.click(header);
 
     expect(
-      screen.getByRole('button', { name: 'Rentas de octubre, Ocultar desglose' }),
+      screen.getByRole('button', { name: 'Resumen de rentas · Octubre, Ocultar desglose' }),
     ).toHaveAttribute('aria-expanded', 'true');
   });
 
@@ -32,8 +34,16 @@ describe('MonthSummary', () => {
     renderWithTheme(<MonthSummary {...props} />);
 
     expect(
-      screen.getByRole('img', { name: /Pagado .*85,000.*Pendiente .*25,000.*Vencido .*10,000/ }),
+      screen.getByRole('img', {
+        name: /Rentas pagadas .*85,000.*Rentas pendientes .*25,000.*Rentas vencidas .*10,000/,
+      }),
     ).toBeInTheDocument();
     expect(screen.getByText(/66,500/)).toBeInTheDocument();
+  });
+
+  it('aclara a la vista que solo cuenta rentas', () => {
+    renderWithTheme(<MonthSummary {...props} />);
+
+    expect(screen.getByText('No incluye depósitos ni cargos adicionales.')).toBeVisible();
   });
 });

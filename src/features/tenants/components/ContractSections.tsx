@@ -1,3 +1,4 @@
+import { shortPlaceName } from '@lib/place';
 import styled from 'styled-components';
 import {
   ActionLink,
@@ -122,7 +123,10 @@ export function CurrentUnitsSection({ tenantId, count }: SectionProps & { count:
                 {contract.fixed_due_day}
               </Line>
               {contract.status === 'expired' ? (
-                <Warning>El contrato venció, pero sigue rentando {contract.unit.name}.</Warning>
+                <Warning>
+                  El contrato venció, pero sigue rentando{' '}
+                  {shortPlaceName(contract.unit.name, contract.property)}.
+                </Warning>
               ) : null}
               <Links>
                 <ActionLink to={`/contratos/${contract.id}`}>Ver contrato</ActionLink>

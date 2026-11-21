@@ -1,4 +1,11 @@
-import { getExpense, getExpenses } from '@api/expenses';
+import { useMutation } from '@tanstack/react-query';
+import {
+  createDepositRefund,
+  deactivateExpense,
+  getExpense,
+  getExpenses,
+  updateRefundAmount,
+} from '@api/expenses';
 import { QueryPageSize, QueryStaleTime, useBaseInfiniteQuery, useBaseQuery } from './queryBase';
 
 type ExpenseFilters = { property_id?: string; unit_id?: string };
@@ -26,3 +33,15 @@ export const useExpense = (expenseId: string | undefined) =>
     QueryStaleTime.operational,
     { enabled: Boolean(expenseId) },
   );
+
+/** Y-16: devolver el depósito. Sin reintentos: un error de red no se reenvía solo. */
+export const useCreateDepositRefund = () =>
+  useMutation({ retry: false, mutationFn: createDepositRefund });
+
+/** Y-17: corregir el importe de la devolución. */
+export const useUpdateRefundAmount = () =>
+  useMutation({ retry: false, mutationFn: updateRefundAmount });
+
+/** Y-17: eliminar (baja lógica) la devolución. */
+export const useDeactivateExpense = () =>
+  useMutation({ retry: false, mutationFn: deactivateExpense });

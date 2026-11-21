@@ -13,6 +13,9 @@ import { ExpenseDetailPage } from '@features/expenses/ExpenseDetailPage';
 import { HomePage } from '@features/home/HomePage';
 import { MovementsPage } from '@features/movements/MovementsPage';
 import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
+import { AddChargePage } from '@features/payments/charges/AddChargePage';
+import { RefundDepositPage } from '@features/payments/deposits/RefundDepositPage';
+import { AddRentPage } from '@features/payments/manualRent/AddRentPage';
 import { PropertiesPage } from '@features/properties/PropertiesPage';
 import { PropertyDetailPage } from '@features/properties/PropertyDetailPage';
 import { PropertyNewPage, PropertySetupPage } from '@features/properties/setup/PropertySetupPage';
@@ -68,6 +71,9 @@ export const router = createBrowserRouter([
       { path: 'contratos/nuevo', element: <CreateContractPage /> },
       { path: 'cobros/:paymentId', element: <PaymentDetailPage /> },
       { path: 'contratos/:contractId', element: <ContractDetailPage /> },
+      { path: 'contratos/:contractId/devolver-deposito', element: <RefundDepositPage /> },
+      { path: 'contratos/:contractId/agregar-cargo', element: <AddChargePage /> },
+      { path: 'contratos/:contractId/agregar-renta', element: <AddRentPage /> },
       { path: 'contratos/:contractId/editar', element: <EditContractPage /> },
       { path: 'contratos/:contractId/continuar', element: <ContinueContractPage /> },
       { path: 'unidades/:unitId', element: <UnitDetailPage /> },

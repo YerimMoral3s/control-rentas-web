@@ -41,4 +41,4 @@ export const dueLabel = (payment: Payment, today: string | undefined) => {
 /** Mensaje precargado para WhatsApp: amable y sin enviarse solo. */
 export const whatsappMessage = (payment: Payment, today: string | undefined) =>
   `Hola ${payment.tenant.first_name}, te escribo por ${paymentConcept(payment).toLowerCase()} de ` +
-  `${payment.unit.name} por ${formatMoney(payment.amount)}. ${dueLabel(payment, today)}. ¡Gracias!`;
+  `${payment.unit.name} por ${formatMoney(payment.amount)}. ${dueLabel(payment, today).replace(/\.$/, '')}. ¡Gracias!`;

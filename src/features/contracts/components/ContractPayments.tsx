@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { RegisterPaymentButton } from '@features/payments/actions/RegisterPaymentButton';
 import styled from 'styled-components';
 import type { Contract } from '@api/contracts';
 import type { PaymentListParams } from '@api/payments';
 import {
   ActionLink,
-  Button,
   ContractMark,
   DetailSection,
   FilterChips,
@@ -157,9 +157,7 @@ export function ContractPayments({ contract }: { contract: Contract }) {
                   <Amount>{formatMoney(payment.amount)}</Amount>
                   <Actions>
                     {unpaid ? (
-                      <Button variant="secondary" disabled title="Disponible próximamente">
-                        Registrar pago
-                      </Button>
+                      <RegisterPaymentButton payment={payment} variant="secondary" />
                     ) : null}
                     <ActionLink to={`/cobros/${payment.id}`} state={FROM_LIST_STATE}>
                       Ver cobro
