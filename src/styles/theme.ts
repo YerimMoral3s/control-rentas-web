@@ -82,6 +82,12 @@ export const theme = {
      * El diseño define 390 y 1440 px; desde 768 px ya caben barra lateral y contenido (acuerdo del 12 nov.).
      */
     desktop: '768px',
+    /**
+     * Regla de tableta (21 nov.): de 768 a 1199 px se conserva la barra lateral, pero el contenido usa
+     * los componentes de teléfono (tarjetas, listas apiladas). Tablas, filas de computadora y columnas
+     * del contenido solo desde aquí. `desktop` queda para el marco (barra lateral, diálogos centrados).
+     */
+    table: '1200px',
     /** Composiciones anchas: tabla de cobros, resumen en una fila y vista rápida junto a la lista. */
     wide: '1200px',
   },
@@ -93,6 +99,8 @@ export type AppTheme = typeof theme;
 export const media = {
   desktop: `@media (min-width: ${theme.breakpoint.desktop})`,
   wide: `@media (min-width: ${theme.breakpoint.wide})`,
+  /** Contenido de computadora (tablas, filas, columnas): desde 1200 px. Ver `breakpoint.table`. */
+  table: `@media (min-width: ${theme.breakpoint.table})`,
   /** Teléfono y tableta (debajo de wide): controles compactos de 40 px (acuerdo del 13 nov.). */
   compact: `@media (max-width: calc(${theme.breakpoint.wide} - 0.02px))`,
   reducedMotion: '@media (prefers-reduced-motion: reduce)',

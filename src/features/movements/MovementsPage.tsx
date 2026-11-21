@@ -43,7 +43,7 @@ const Page = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 20px;
   }
 `;
@@ -54,7 +54,7 @@ const Head = styled.div`
   gap: 12px;
 
   /* En computadora el título y las acciones van en una fila. */
-  ${media.desktop} {
+  ${media.table} {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
@@ -80,13 +80,13 @@ const HeadActions = styled.div`
   justify-content: space-between;
   gap: 8px 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     justify-content: flex-end;
   }
 `;
 
 const Search = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     width: 420px;
   }
 `;
@@ -128,7 +128,7 @@ const isType = (value: string | null): value is MovementType =>
 
 /** M-01 a M-04: libreta del dinero que ya entró o salió. Filtros en la URL para volver al mismo punto. */
 export function MovementsPage() {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   // Fecha operativa del servidor (misma consulta en caché que Inicio) para "Hoy" y los meses.
   const today = useAttentionPayments('all', '').meta?.as_of_date;
   const [params, setParams] = useSearchParams();

@@ -49,7 +49,7 @@ const Head = styled.header`
 `;
 
 const Search = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     width: 420px;
   }
 `;

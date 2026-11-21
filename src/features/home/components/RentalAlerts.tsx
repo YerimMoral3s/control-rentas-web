@@ -229,7 +229,7 @@ const DialogText = styled.p`
 const DialogList = styled.div`
   margin: 0 -16px 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     margin: 0 -24px 16px;
   }
 `;
@@ -365,7 +365,7 @@ type RentalAlertsProps = {
 
 /** H-04 / H-05: contratos por vencer y unidades por atender. Solo aparecen si hay algo que atender. */
 export function RentalAlerts({ alerts }: RentalAlertsProps) {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   const [sheet, setSheet] = useState<SheetKind | null>(null);
   const expiring = alerts.contracts_expiring_soon;
   const maintenance = alerts.units_maintenance;

@@ -77,7 +77,7 @@ const Grid = styled.div`
   display: grid;
   gap: 20px;
 
-  ${media.desktop} {
+  ${media.table} {
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
   }
@@ -182,7 +182,7 @@ const DoneActions = styled.div`
   flex-direction: column;
   gap: 8px;
 
-  ${media.desktop} {
+  ${media.table} {
     flex-direction: row;
   }
 `;

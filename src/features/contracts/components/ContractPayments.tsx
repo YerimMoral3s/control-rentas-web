@@ -52,7 +52,7 @@ const Row = styled.li`
   gap: 4px 12px;
   align-items: center;
 
-  ${media.desktop} {
+  ${media.table} {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 140px 110px minmax(0, 1.2fr);
     grid-template-areas: 'concept date status amount actions';
   }
@@ -80,7 +80,7 @@ const Status = styled.span`
   grid-area: status;
   justify-self: end;
 
-  ${media.desktop} {
+  ${media.table} {
     justify-self: start;
   }
 `;

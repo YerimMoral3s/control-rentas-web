@@ -302,7 +302,7 @@ export function MonthSummary({
 }: MonthSummaryProps) {
   // Estado inicial según el dispositivo; luego solo cambia por la usuaria (F-06).
   const [open, setOpen] = useState(
-    () => window.matchMedia(`(min-width: ${tokens.breakpoint.desktop})`).matches,
+    () => window.matchMedia(`(min-width: ${tokens.breakpoint.table})`).matches,
   );
   const contentId = useId();
   const title = `Resumen de rentas · ${monthName.charAt(0).toUpperCase()}${monthName.slice(1)}`;

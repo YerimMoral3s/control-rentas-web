@@ -12,7 +12,7 @@ export const StepPanel = styled.section`
   border: 1px solid ${({ theme }) => theme.color.neutral200};
   border-radius: ${({ theme }) => theme.radius.panel};
 
-  ${media.desktop} {
+  ${media.table} {
     padding: 24px;
   }
 `;
@@ -43,7 +43,7 @@ export const StepFooter = styled.div`
   gap: 8px;
   border-top: 1px solid ${({ theme }) => theme.color.neutral200};
 
-  ${media.desktop} {
+  ${media.table} {
     flex-direction: row-reverse;
     justify-content: flex-start;
     gap: 12px;
@@ -86,14 +86,20 @@ export const RowText = styled.span`
  * final de una lista larga (pedido del usuario, 14 nov.). En computadora es un pie normal.
  */
 export const StickyStepFooter = styled(StepFooter)`
-  @media (max-width: calc(${({ theme }) => theme.breakpoint.desktop} - 0.02px)) {
+  @media (max-width: calc(${({ theme }) => theme.breakpoint.table} - 0.02px)) {
     position: sticky;
-    bottom: calc(${({ theme }) => theme.size.bottomNav} + env(safe-area-inset-bottom));
+    /* Tableta: sin barra inferior (hay barra lateral), el pie va pegado al borde. */
+    bottom: env(safe-area-inset-bottom);
     z-index: 1;
     margin: 0 -16px -20px;
     padding: 12px 16px;
     background: ${({ theme }) => theme.color.white};
     border-radius: 0 0 ${({ theme }) => theme.radius.panel} ${({ theme }) => theme.radius.panel};
     box-shadow: 0 -8px 16px -12px rgba(16, 24, 40, 0.25);
+  }
+
+  /* Teléfono: encima de la barra inferior. */
+  @media (max-width: calc(${({ theme }) => theme.breakpoint.desktop} - 0.02px)) {
+    bottom: calc(${({ theme }) => theme.size.bottomNav} + env(safe-area-inset-bottom));
   }
 `;

@@ -12,7 +12,7 @@ const Page = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 24px;
   }
 `;
@@ -42,7 +42,7 @@ const MobileBar = styled.div`
   gap: 8px;
   margin: -8px 0 0 -10px;
 
-  ${media.desktop} {
+  ${media.table} {
     display: none;
   }
 `;
@@ -64,7 +64,7 @@ const MobileStep = styled.p`
     color: ${({ theme }) => theme.color.neutral600};
   }
 
-  ${media.desktop} {
+  ${media.table} {
     display: none;
   }
 `;
@@ -74,7 +74,7 @@ const Columns = styled.div`
   flex-direction: column;
   gap: 20px;
 
-  ${media.desktop} {
+  ${media.table} {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr);
     align-items: start;
@@ -86,7 +86,7 @@ const Columns = styled.div`
 const Steps = styled.nav`
   display: none;
 
-  ${media.desktop} {
+  ${media.table} {
     position: sticky;
     top: 24px;
     display: flex;

@@ -11,7 +11,7 @@ const List = styled.div`
     display: none;
   }
 
-  ${media.desktop} {
+  ${media.table} {
     flex-wrap: wrap;
     overflow: visible;
   }

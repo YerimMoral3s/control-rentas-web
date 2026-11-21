@@ -73,7 +73,7 @@ const Actions = styled.div`
   grid-template-columns: 1fr 1fr auto;
   gap: 8px;
 
-  ${media.desktop} {
+  ${media.table} {
     display: flex;
   }
 `;

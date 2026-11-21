@@ -24,7 +24,7 @@ const Results = styled.ul`
   flex-direction: column;
   gap: 8px;
 
-  ${media.desktop} {
+  ${media.table} {
     max-height: 360px;
     overflow-y: auto;
   }

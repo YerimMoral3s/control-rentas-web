@@ -52,7 +52,7 @@ const Cards = styled.div`
   display: grid;
   gap: 12px;
 
-  ${media.desktop} {
+  ${media.table} {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 `;

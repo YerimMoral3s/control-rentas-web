@@ -52,7 +52,7 @@ const Preview = styled.section`
     max-height: 280px;
     overflow-y: auto;
 
-    ${media.desktop} {
+    ${media.table} {
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
   }

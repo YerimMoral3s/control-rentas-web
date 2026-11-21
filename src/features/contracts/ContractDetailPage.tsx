@@ -94,7 +94,7 @@ const Data = styled.dl`
     font-weight: 600;
     text-align: right;
 
-    ${media.desktop} {
+    ${media.table} {
       text-align: left;
     }
   }
