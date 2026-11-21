@@ -45,7 +45,7 @@ const DESKTOP_COLUMNS = '150px minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 1fr) 
 export const HeaderRow = styled.div`
   display: none;
 
-  ${media.desktop} {
+  ${media.table} {
     display: grid;
     grid-template-columns: ${DESKTOP_COLUMNS};
     gap: 16px;
@@ -73,7 +73,7 @@ const Row = styled(Link)`
     background: ${({ theme }) => theme.color.neutral50};
   }
 
-  ${media.desktop} {
+  ${media.table} {
     min-height: 56px;
     padding: 10px 20px;
     align-items: center;
@@ -89,7 +89,7 @@ const When = styled.span`
   font-size: 13px;
   color: ${({ theme }) => theme.color.neutral600};
 
-  ${media.desktop} {
+  ${media.table} {
     display: block;
   }
 `;
@@ -109,7 +109,7 @@ const KindIcon = styled.span<{ $income: boolean }>`
   color: ${({ $income, theme }) => ($income ? theme.color.success : theme.color.neutral700)};
 
   /* En la tabla de computadora el icono va junto al concepto (InlineIcon). */
-  ${media.desktop} {
+  ${media.table} {
     display: none;
   }
 `;
@@ -121,7 +121,7 @@ const InlineIcon = styled(KindIcon)`
   margin: 0;
   align-self: center;
 
-  ${media.desktop} {
+  ${media.table} {
     display: flex;
   }
 `;
@@ -140,13 +140,25 @@ const Concept = styled.strong`
   ${clampLines(2)}
 `;
 
+/** M-05: el origen tuvo correcciones; el historial está en "Historial de correcciones". */
+export const Corrected = styled.span`
+  flex: none;
+  padding: 1px 8px;
+  border-radius: ${({ theme }) => theme.radius.pill};
+  background: ${({ theme }) => theme.color.neutral100};
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.color.neutral700};
+`;
+
 const Related = styled.span`
   grid-area: related;
   font-size: 13px;
   line-height: 18px;
   color: ${({ theme }) => theme.color.neutral700};
 
-  ${media.desktop} {
+  ${media.table} {
     font-size: 15px;
   }
 `;
@@ -169,7 +181,7 @@ const Amount = styled.span<{ $income: boolean }>`
   white-space: nowrap;
   color: ${({ $income, theme }) => ($income ? theme.color.success : theme.color.neutral950)};
 
-  ${media.desktop} {
+  ${media.table} {
     align-self: center;
   }
 `;
@@ -210,6 +222,7 @@ export function MovementList({ movements, today, desktop }: MovementListProps) {
                         <Icon name={income ? 'moneyIn' : 'moneyOut'} size={16} strokeWidth={2.4} />
                       </InlineIcon>
                       <Concept>{movement.concept}</Concept>
+                      {movement.has_corrections ? <Corrected>Corregido</Corrected> : null}
                     </ConceptCell>
                     <Related>{movementRelated(movement)}</Related>
                     <Kind>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { Notice, ReturnLink, SectionError, Skeleton, StateMessage, StatusBadge } from '@components';
 import { useResultNotice } from '@lib/useResultNotice';
@@ -84,6 +85,15 @@ export function UnitDetailPage() {
           { label: 'Editar unidad', onSelect: () => void navigate(`/unidades/${unit.id}/editar`) },
           { label: 'Eliminar unidad', danger: true, onSelect: () => setDeleting(true) },
         ]}
+      />
+      <NotesSection
+        target={{ target_type: 'unit', target_id: unit.id }}
+        label="esta unidad"
+        readOnlyReason={
+          unit.status === 'inactive'
+            ? 'Esta unidad fue eliminada. Puedes consultar sus notas.'
+            : null
+        }
       />
       <DeleteUnitDialog unit={unit} open={deleting} onClose={() => setDeleting(false)} />
     </DetailPage>

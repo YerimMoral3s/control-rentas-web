@@ -20,7 +20,7 @@ export const List = styled.ul<{ $inBox?: boolean }>`
   flex-direction: column;
   gap: 12px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 0;
     background: ${({ theme }) => theme.color.white};
     border: ${({ $inBox, theme }) => ($inBox ? '0' : `1px solid ${theme.color.neutral200}`)};
@@ -34,7 +34,7 @@ export const List = styled.ul<{ $inBox?: boolean }>`
 `;
 
 export const TableBox = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     border: 1px solid ${({ theme }) => theme.color.neutral200};
     border-radius: ${({ theme }) => theme.radius.card};
     overflow: hidden;
@@ -46,7 +46,7 @@ const COLUMNS = 'minmax(0, 1.3fr) minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 1.
 export const ListHeader = styled.div`
   display: none;
 
-  ${media.desktop} {
+  ${media.table} {
     display: grid;
     grid-template-columns: ${COLUMNS};
     gap: 16px;
@@ -74,7 +74,7 @@ const Row = styled(Link)`
     background: ${({ theme }) => theme.color.neutral50};
   }
 
-  ${media.desktop} {
+  ${media.table} {
     min-height: 64px;
     padding: 10px 20px;
     display: grid;
@@ -109,13 +109,13 @@ const DesktopCell = styled.span`
   font-size: 15px;
   color: ${({ theme }) => theme.color.neutral700};
 
-  ${media.desktop} {
+  ${media.table} {
     display: block;
   }
 `;
 
 const MobileOnly = styled.span`
-  ${media.desktop} {
+  ${media.table} {
     display: none;
   }
 `;
@@ -129,13 +129,13 @@ const Side = styled.span`
   display: flex;
   align-items: center;
 
-  ${media.desktop} {
+  ${media.table} {
     display: none;
   }
 `;
 
 const StatusCell = styled(DesktopCell)`
-  ${media.desktop} {
+  ${media.table} {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -206,7 +206,7 @@ const Incomplete = styled.li`
   border: 1px solid ${({ theme }) => theme.color.warningBorder};
   border-radius: ${({ theme }) => theme.radius.card};
 
-  ${media.desktop} {
+  ${media.table} {
     border-radius: 0;
     border-width: 0;
     flex-direction: row;

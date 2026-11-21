@@ -66,7 +66,7 @@ const periodMonthName = (period: string) => {
 
 /** Fecha operativa del servidor; misma consulta (y caché) que la lista de Pagos por atender. */
 function TodayLine() {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   const { meta } = useAttentionPayments('all', '');
   const today = meta?.as_of_date;
   if (!today) return <DateLine aria-hidden="true" />;

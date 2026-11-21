@@ -16,7 +16,7 @@ const Grid = styled.div<{ $compact: boolean }>`
     $compact
       ? ''
       : `
-    ${media.desktop} {
+    ${media.table} {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   `}

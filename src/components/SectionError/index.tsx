@@ -6,6 +6,8 @@ type SectionErrorProps = {
   retrying: boolean;
   /** Qué sigue disponible, por ejemplo "El resto de Inicio sigue disponible." */
   description?: string;
+  /** M-07: un título propio ("No pudimos cargar el historial"). */
+  title?: string;
 };
 
 /** S-06 / H-12: si un bloque falla, el resto de la pantalla sigue disponible. */
@@ -13,11 +15,12 @@ export function SectionError({
   onRetry,
   retrying,
   description = 'El resto de la página sigue disponible.',
+  title = 'No pudimos cargar esta sección',
 }: SectionErrorProps) {
   return (
     <StateMessage
       kind="error"
-      title="No pudimos cargar esta sección"
+      title={title}
       description={description}
       action={
         <Button

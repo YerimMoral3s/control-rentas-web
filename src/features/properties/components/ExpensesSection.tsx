@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import {
-  Button,
+  ButtonLink,
   DetailSection,
   ListFooter,
   MutedText,
@@ -66,14 +66,22 @@ type ExpensesSectionProps = {
   filters: { property_id?: string; unit_id?: string };
 };
 
-/** Gastos de una propiedad o unidad. Registrar gasto llega con su formulario (fase 7). */
+/** Gastos de una propiedad o unidad, con Registrar gasto en ese destino (E-02). */
 export function ExpensesSection({ filters }: ExpensesSectionProps) {
   const query = useExpenses(filters);
 
   const action = (
-    <Button variant="tertiary" icon="plus" disabled title="Disponible próximamente">
+    <ButtonLink
+      variant="tertiary"
+      icon="plus"
+      to={
+        filters.unit_id
+          ? `/gastos/nuevo?unidad=${filters.unit_id}`
+          : `/gastos/nuevo?propiedad=${filters.property_id ?? ''}`
+      }
+    >
       Registrar gasto
-    </Button>
+    </ButtonLink>
   );
 
   return (

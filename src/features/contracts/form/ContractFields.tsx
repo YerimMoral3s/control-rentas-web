@@ -48,7 +48,7 @@ const Grid = styled.div`
   display: grid;
   gap: 20px;
 
-  ${media.desktop} {
+  ${media.table} {
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
   }

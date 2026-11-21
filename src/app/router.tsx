@@ -10,6 +10,10 @@ import { RegisterExistingContractPage } from '@features/contracts/existing/Regis
 import { ContractDetailPage } from '@features/contracts/ContractDetailPage';
 import { ContractsPage } from '@features/contracts/ContractsPage';
 import { ExpenseDetailPage } from '@features/expenses/ExpenseDetailPage';
+import { NewExpensePage } from '@features/expenses/create/NewExpensePage';
+import { EditExpensePage } from '@features/expenses/edit/EditExpensePage';
+import { HistoryListPage } from '@features/movements/history/HistoryListPage';
+import { SourceHistoryPage } from '@features/movements/history/SourceHistoryPage';
 import { HomePage } from '@features/home/HomePage';
 import { MovementsPage } from '@features/movements/MovementsPage';
 import { PaymentDetailPage } from '@features/payments/PaymentDetailPage';
@@ -56,7 +60,14 @@ export const router = createBrowserRouter([
       { path: 'inquilinos/:tenantId', element: <TenantDetailPage /> },
       { path: 'inquilinos/:tenantId/editar', element: <TenantEditPage /> },
       { path: 'movimientos', element: <MovementsPage /> },
+      { path: 'gastos/nuevo', element: <NewExpensePage /> },
       { path: 'gastos/:expenseId', element: <ExpenseDetailPage /> },
+      { path: 'gastos/:expenseId/editar', element: <EditExpensePage /> },
+      { path: 'movimientos/historial', element: <HistoryListPage /> },
+      {
+        path: 'movimientos/historial/:sourceType/:sourceId',
+        element: <SourceHistoryPage />,
+      },
       { path: 'propiedades', element: <PropertiesPage /> },
       { path: 'propiedades/nueva', element: <PropertyNewPage /> },
       { path: 'propiedades/:propertyId', element: <PropertyDetailPage /> },

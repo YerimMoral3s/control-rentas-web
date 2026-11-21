@@ -13,7 +13,7 @@ export const EditCard = styled.form`
   border: 1px solid ${({ theme }) => theme.color.neutral200};
   border-radius: ${({ theme }) => theme.radius.panel};
 
-  ${media.desktop} {
+  ${media.table} {
     padding: 24px;
   }
 `;
@@ -25,7 +25,7 @@ export const EditFooter = styled.div`
   gap: 8px;
   border-top: 1px solid ${({ theme }) => theme.color.neutral200};
 
-  ${media.desktop} {
+  ${media.table} {
     flex-direction: row-reverse;
     justify-content: flex-start;
     gap: 12px;

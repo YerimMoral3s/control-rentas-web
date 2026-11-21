@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { Link, useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { PaymentDetail } from '@api/payments';
@@ -36,6 +37,7 @@ import {
   EditChargeDialog,
   ReactivateRentDialog,
 } from './actions/ManualRentDialogs';
+import { HistoryLink } from '@features/movements/history/HistoryLink';
 import { RegisterPaymentButton } from './actions/RegisterPaymentButton';
 import { JointCorrectionDialog } from './deposits/JointCorrectionDialog';
 import { media, theme as tokens, pageTitle } from '@styles/theme';
@@ -156,7 +158,7 @@ const Data = styled.dl`
     font-weight: 600;
     text-align: right;
 
-    ${media.desktop} {
+    ${media.table} {
       text-align: left;
     }
   }
@@ -304,6 +306,7 @@ export function PaymentDetailPage() {
           </Button>
         ) : null}
         <ActionLink to={`/contratos/${payment.contract.id}`}>Ver contrato</ActionLink>
+        <HistoryLink type="payment" id={payment.id} />
         {manual && unpaid ? (
           <ActionMenu
             items={[
@@ -374,6 +377,7 @@ export function PaymentDetailPage() {
           </div>
         </Data>
       </DetailSection>
+      <NotesSection target={{ target_type: 'payment', target_id: payment.id }} label="este pago" />
       {refund ? (
         <JointCorrectionDialog
           payment={payment}

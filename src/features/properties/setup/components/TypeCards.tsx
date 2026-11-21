@@ -9,7 +9,7 @@ const Cards = styled.div`
   display: grid;
   gap: 10px;
 
-  ${media.desktop} {
+  ${media.table} {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 `;

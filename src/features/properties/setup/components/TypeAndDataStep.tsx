@@ -54,7 +54,7 @@ type TypeAndDataStepProps = {
 
 /** Paso 1 (P-05 + P-06): tipo y datos. En celular son dos vistas; en computadora, una. */
 export function TypeAndDataStep({ property, units = [] }: TypeAndDataStepProps) {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   const nav = useSetupNavigation();
   const events = useInvalidateEvents();
   const create = useCreateProperty();

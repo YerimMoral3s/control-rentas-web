@@ -29,7 +29,7 @@ const Page = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 24px;
   }
 `;
@@ -47,7 +47,7 @@ const Head = styled.div`
 `;
 
 const Search = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     width: 420px;
   }
 `;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { Link, useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Expense } from '@api/expenses';
@@ -6,8 +7,8 @@ import {
   ActionLink,
   ActionMenu,
   Button,
+  ButtonLink,
   DetailSection,
-  Icon,
   Notice,
   ReturnLink,
   SectionError,
@@ -16,8 +17,10 @@ import {
 } from '@components';
 import { useExpense } from '@hooks/querys/expenses';
 import { usePayment } from '@hooks/querys/payments';
+import { HistoryLink } from '@features/movements/history/HistoryLink';
 import { withResult, useResultNotice, type ResultMessage } from '@lib/useResultNotice';
 import { DeleteRefundDialog, EditRefundDialog } from '@features/payments/deposits/RefundDialogs';
+import { DeleteExpenseDialog } from './edit/DeleteExpenseDialog';
 import { formatDateWithYear } from '@lib/dates';
 import { formatMoney } from '@lib/format';
 import { expenseTypeLabel } from '@lib/labels';
@@ -106,7 +109,7 @@ const Data = styled.dl`
     font-weight: 600;
     text-align: right;
 
-    ${media.desktop} {
+    ${media.table} {
       text-align: left;
     }
   }
@@ -115,8 +118,6 @@ const Data = styled.dl`
     color: ${({ theme }) => theme.color.primary600};
   }
 `;
-
-const comingSoon = { disabled: true, title: 'Disponible próximamente' } as const;
 
 /** Destino del gasto: una unidad o toda la propiedad (exactamente uno en un gasto ordinario). */
 const target = (expense: Expense) =>
@@ -136,7 +137,7 @@ const target = (expense: Expense) =>
         }
       : null;
 
-/** E-03: detalle de gasto. Editar y eliminar llegan con la fase 7; la devolución de depósito, con la 6. */
+/** E-03: detalle de gasto con Editar gasto y Eliminar gasto; la devolución de depósito usa Y-17. */
 export function ExpenseDetailPage() {
   const { expenseId } = useParams();
   const query = useExpense(expenseId);
@@ -221,20 +222,30 @@ export function ExpenseDetailPage() {
           </>
         ) : (
           <>
-            {/* Editar y eliminar gastos llegan con la fase 7. */}
-            <Button variant="secondary" {...comingSoon}>
+            <ButtonLink variant="secondary" to={`/gastos/${expense.id}/editar`}>
               Editar gasto
-            </Button>
-            <Button variant="neutral" {...comingSoon} aria-label="Más acciones">
-              <Icon name="more" size={20} />
-            </Button>
+            </ButtonLink>
+            <ActionMenu
+              items={[
+                { label: 'Eliminar gasto', danger: true, onSelect: () => setDialog('delete') },
+              ]}
+            />
           </>
         )}
         {expense.deposit_payment ? (
           <ActionLink to={`/cobros/${expense.deposit_payment.id}`}>Ver depósito</ActionLink>
         ) : null}
+        <HistoryLink type="expense" id={expense.id} />
       </Actions>
 
+      {refund ? null : (
+        <DeleteExpenseDialog
+          expense={expense}
+          place={destination?.name ?? null}
+          open={dialog === 'delete'}
+          onClose={() => setDialog(null)}
+        />
+      )}
       {refund ? (
         <>
           <EditRefundDialog
@@ -302,6 +313,7 @@ export function ExpenseDetailPage() {
           ) : null}
         </Data>
       </DetailSection>
+      <NotesSection target={{ target_type: 'expense', target_id: expense.id }} label="este gasto" />
     </Page>
   );
 }

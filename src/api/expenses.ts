@@ -86,3 +86,94 @@ export const deactivateExpense = (expenseId: string) =>
     url: `/expenses/${encodeURIComponent(expenseId)}/deactivate`,
     operation: 'expense_deactivate',
   });
+
+/** E-01: categorías de un gasto general (la devolución de depósito se registra desde el depósito). */
+export type GeneralExpenseType = Exclude<ExpenseType, 'deposit_refund'>;
+
+/** E-01 / E-02: exactamente un destino (propiedad o unidad) y contrato opcional como referencia. */
+export type ExpenseInput = {
+  property_id?: string;
+  unit_id?: string;
+  related_contract_id?: string | null;
+  expense_type: GeneralExpenseType;
+  amount: number;
+  expense_date: string;
+  description?: string | null;
+};
+
+/** POST /v1/expenses — 201 con el gasto creado. */
+export const createExpense = (body: ExpenseInput) =>
+  apiRequest<Expense>({
+    method: 'POST',
+    url: '/expenses',
+    data: body,
+    operation: 'expense_create',
+  });
+
+/** E-04: cambios de un gasto general; solo se manda lo que cambió. */
+export type ExpenseChanges = {
+  property_id?: string | null;
+  unit_id?: string | null;
+  /** null quita la referencia al contrato de forma explícita. */
+  related_contract_id?: string | null;
+  expense_type?: GeneralExpenseType;
+  amount?: number;
+  expense_date?: string;
+  description?: string | null;
+};
+
+/** E-04: estado vigente y propuesto de un gasto (FE-38). */
+export type ExpenseReviewState = {
+  id: string;
+  expense_type: ExpenseType;
+  status: 'active';
+  amount: string;
+  expense_date: string;
+  description: string | null;
+  property: { id: string; name: string; property_type: PropertyType } | null;
+  unit: {
+    id: string;
+    name: string;
+    property: { id: string; name: string; property_type: PropertyType };
+  } | null;
+  related_contract_id: string | null;
+  deposit_payment: { id: string } | null;
+};
+
+export type ExpenseUpdatePreview = {
+  before: ExpenseReviewState;
+  after: ExpenseReviewState;
+  preview_token: string;
+};
+
+/** POST /v1/expenses/:id/preview — no modifica nada (E-04). */
+export const previewExpenseUpdate = ({
+  expenseId,
+  changes,
+}: {
+  expenseId: string;
+  changes: ExpenseChanges;
+}) =>
+  apiRequest<ExpenseUpdatePreview>({
+    method: 'POST',
+    url: `/expenses/${encodeURIComponent(expenseId)}/preview`,
+    data: changes,
+    operation: 'expense_update_preview',
+  });
+
+/** PATCH /v1/expenses/:id — los mismos campos y el token de su revisión (E-04). */
+export const updateExpense = ({
+  expenseId,
+  changes,
+  previewToken,
+}: {
+  expenseId: string;
+  changes: ExpenseChanges;
+  previewToken: string;
+}) =>
+  apiRequest<Expense>({
+    method: 'PATCH',
+    url: `/expenses/${encodeURIComponent(expenseId)}`,
+    data: { ...changes, preview_token: previewToken },
+    operation: 'expense_update',
+  });

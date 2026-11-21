@@ -33,7 +33,7 @@ const Page = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 24px;
   }
 `;
@@ -51,7 +51,7 @@ const Head = styled.div`
 `;
 
 const Search = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     width: 420px;
   }
 `;
@@ -82,7 +82,7 @@ function CreateTenantButton() {
  * búsqueda local con MiniSearch al escribir y scroll infinito sin pedir más al servidor.
  */
 export function TenantsPage() {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   const isWide = useMediaQuery(`(min-width: ${tokens.breakpoint.wide})`);
   // La búsqueda vive en la URL: al volver del detalle se conserva.
   const [params, setParams] = useSearchParams();

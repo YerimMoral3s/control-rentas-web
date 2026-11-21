@@ -44,7 +44,7 @@ const Page = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  ${media.desktop} {
+  ${media.table} {
     gap: 20px;
   }
 
@@ -55,7 +55,7 @@ const Page = styled.div`
 `;
 
 const Search = styled.div`
-  ${media.desktop} {
+  ${media.table} {
     width: 420px;
   }
 `;
@@ -75,7 +75,7 @@ const ListColumn = styled.div`
 
 /** C-01 y C-02: contratos con búsqueda y estado en la URL, scroll infinito y vista rápida. */
 export function ContractsPage() {
-  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.desktop})`);
+  const isDesktop = useMediaQuery(`(min-width: ${tokens.breakpoint.table})`);
   const isWide = useMediaQuery(`(min-width: ${tokens.breakpoint.wide})`);
   const [params, setParams] = useSearchParams();
   const search = params.get('q') ?? '';

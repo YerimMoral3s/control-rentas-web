@@ -70,7 +70,8 @@ const Content = styled.div`
   /* Computadora ancha: una fila (Renta esperada | barra | Balance) y el desglose debajo. */
   ${media.wide} {
     display: grid;
-    grid-template-columns: 220px minmax(0, 1fr) 260px;
+    /* Renta esperada y Balance toman el ancho de su importe; la barra se ajusta al resto. */
+    grid-template-columns: minmax(180px, auto) minmax(160px, 1fr) minmax(240px, auto);
     grid-template-areas:
       'expected bar balance'
       'breakdown breakdown breakdown';
@@ -121,10 +122,12 @@ const RowLabel = styled.span<{ $color?: string }>`
   color: ${({ $color, theme }) => $color ?? theme.color.neutral700};
 `;
 
+/** Un importe nunca se corta en dos líneas. */
 const BigAmount = styled.span`
   font-size: 24px;
   line-height: 30px;
   font-weight: 700;
+  white-space: nowrap;
 `;
 
 const Amount = styled.span`
@@ -241,6 +244,7 @@ const Balance = styled.div`
 
   ${media.wide} {
     grid-area: balance;
+    gap: 16px;
   }
 `;
 
@@ -298,7 +302,7 @@ export function MonthSummary({
 }: MonthSummaryProps) {
   // Estado inicial según el dispositivo; luego solo cambia por la usuaria (F-06).
   const [open, setOpen] = useState(
-    () => window.matchMedia(`(min-width: ${tokens.breakpoint.desktop})`).matches,
+    () => window.matchMedia(`(min-width: ${tokens.breakpoint.table})`).matches,
   );
   const contentId = useId();
   const title = `Resumen de rentas · ${monthName.charAt(0).toUpperCase()}${monthName.slice(1)}`;
