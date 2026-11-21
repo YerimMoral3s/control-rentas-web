@@ -20,6 +20,7 @@ const movement = (fields: Partial<Movement>): Movement => ({
   tenant: { id: 't', first_name: 'María', last_name: 'López' },
   unit: { id: 'u', name: 'Departamento 101' },
   property: { id: 'p', name: 'Torre Centro', property_type: 'building' },
+  has_corrections: false,
   ...fields,
 });
 

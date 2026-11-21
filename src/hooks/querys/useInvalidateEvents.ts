@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+import type { CommentTarget } from '@api/comments';
 import { useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query';
+import { CommentsQueryKeys } from './comments';
 import { ContractsQueryKeys } from './contracts';
 import { DashboardQueryKeys } from './dashboard';
 import { ExpensesQueryKeys } from './expenses';
@@ -61,6 +63,11 @@ const buildEvents = (queryClient: QueryClient) => {
         DashboardQueryKeys.root,
         TenantsQueryKeys.root,
       ]),
+    /** E-01 a E-05: gasto registrado, editado o eliminado. */
+    expenseChanged: () =>
+      invalidate([ExpensesQueryKeys.root, MovementsQueryKeys.root, DashboardQueryKeys.root]),
+    /** N-03 / N-04: notas de un registro (solo esa lista). */
+    commentsChanged: (target: CommentTarget) => invalidate([CommentsQueryKeys.list(target)]),
     /** Propiedad nueva (incompleta): aparece primero en Propiedades. */
     propertyCreated: () => invalidate([PropertiesQueryKeys.root]),
     /** Nombre, ubicación o tipo cambiaron: también se ven en Inicio y en sus unidades. */

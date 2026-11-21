@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import {
-  Button,
+  ButtonLink,
   DetailSection,
   MutedText,
   Panel,
@@ -69,9 +69,9 @@ export function RecentExpensesSection({ propertyId }: { propertyId: string }) {
   const query = useRecentMovements({ kind: 'expense', property_id: propertyId }, RECENT_SIZE);
 
   const action = (
-    <Button variant="tertiary" icon="plus" disabled title="Disponible próximamente">
+    <ButtonLink variant="tertiary" icon="plus" to={`/gastos/nuevo?propiedad=${propertyId}`}>
       Registrar gasto
-    </Button>
+    </ButtonLink>
   );
 
   return (

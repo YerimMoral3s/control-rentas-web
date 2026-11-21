@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Property } from '@api/properties';
@@ -210,6 +211,10 @@ export function PropertyDetailPage() {
         {back}
         {notice}
         <SingleUnitProperty property={property} propertyMenu={propertyMenu} />
+        <NotesSection
+          target={{ target_type: 'property', target_id: property.id }}
+          label="esta propiedad"
+        />
         {deleteDialog}
       </DetailPage>
     );
@@ -250,6 +255,10 @@ export function PropertyDetailPage() {
           <RecentExpensesSection propertyId={property.id} />
         </Column>
       </TwoColumns>
+      <NotesSection
+        target={{ target_type: 'property', target_id: property.id }}
+        label="esta propiedad"
+      />
       {deleteDialog}
     </DetailPage>
   );

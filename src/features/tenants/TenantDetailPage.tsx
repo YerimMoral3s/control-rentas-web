@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
 import {
@@ -166,6 +167,15 @@ export function TenantDetailPage() {
       <OverdueSection tenant={tenant} />
       <CurrentUnitsSection tenantId={tenant.id} count={tenant.current_contracts.length} />
       <HistorySection tenantId={tenant.id} />
+      <NotesSection
+        target={{ target_type: 'tenant', target_id: tenant.id }}
+        label="este inquilino"
+        readOnlyReason={
+          tenant.status === 'inactive'
+            ? 'Este inquilino fue eliminado. Puedes consultar sus notas.'
+            : null
+        }
+      />
       <DeleteTenantDialog tenant={tenant} open={deleting} onClose={() => setDeleting(false)} />
     </Page>
   );

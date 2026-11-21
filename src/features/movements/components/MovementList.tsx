@@ -140,6 +140,18 @@ const Concept = styled.strong`
   ${clampLines(2)}
 `;
 
+/** M-05: el origen tuvo correcciones; el historial está en "Historial de correcciones". */
+export const Corrected = styled.span`
+  flex: none;
+  padding: 1px 8px;
+  border-radius: ${({ theme }) => theme.radius.pill};
+  background: ${({ theme }) => theme.color.neutral100};
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.color.neutral700};
+`;
+
 const Related = styled.span`
   grid-area: related;
   font-size: 13px;
@@ -210,6 +222,7 @@ export function MovementList({ movements, today, desktop }: MovementListProps) {
                         <Icon name={income ? 'moneyIn' : 'moneyOut'} size={16} strokeWidth={2.4} />
                       </InlineIcon>
                       <Concept>{movement.concept}</Concept>
+                      {movement.has_corrections ? <Corrected>Corregido</Corrected> : null}
                     </ConceptCell>
                     <Related>{movementRelated(movement)}</Related>
                     <Kind>

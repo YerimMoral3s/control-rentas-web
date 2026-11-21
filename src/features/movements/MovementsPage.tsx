@@ -5,9 +5,12 @@ import type { ExpenseType } from '@api/expenses';
 import type { MovementKind } from '@api/movements';
 import type { PaymentType } from '@api/payments';
 import {
+  ActionLink,
   Button,
+  ButtonLink,
   FilterChips,
   ListFooter,
+  Notice,
   SearchField,
   SectionError,
   Skeleton,
@@ -18,6 +21,7 @@ import { useAttentionPayments } from '@hooks/querys/payments';
 import { monthRange } from '@lib/dates';
 import { EXPENSE_TYPES, movementTypeName, PAYMENT_TYPES } from '@lib/labels';
 import { useMediaQuery } from '@lib/useMediaQuery';
+import { useResultNotice } from '@lib/useResultNotice';
 import { media, theme as tokens, pageTitle } from '@styles/theme';
 import { HeaderRow, MovementList } from './components/MovementList';
 
@@ -46,9 +50,16 @@ const Page = styled.div`
 
 const Head = styled.div`
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
+
+  /* En computadora el título y las acciones van en una fila. */
+  ${media.desktop} {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
 
   h1 {
     margin: 0;
@@ -59,6 +70,18 @@ const Head = styled.div`
     margin: 2px 0 0;
     font-size: 15px;
     color: ${({ theme }) => theme.color.neutral600};
+  }
+`;
+
+const HeadActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+
+  ${media.desktop} {
+    justify-content: flex-end;
   }
 `;
 
@@ -109,6 +132,7 @@ export function MovementsPage() {
   // Fecha operativa del servidor (misma consulta en caché que Inicio) para "Hoy" y los meses.
   const today = useAttentionPayments('all', '').meta?.as_of_date;
   const [params, setParams] = useSearchParams();
+  const { result, dismiss } = useResultNotice();
   const search = params.get('q') ?? '';
   const rawKind = params.get('tipo');
   const kind: Chip = isChip(rawKind) ? rawKind : 'all';
@@ -146,20 +170,23 @@ export function MovementsPage() {
   const typeOptions =
     kind === 'income' ? PAYMENT_TYPES : kind === 'expense' ? EXPENSE_TYPES : ALL_TYPES;
 
-  // Registrar gasto llega con su formulario (fase 7): deshabilitado, sin simular.
+  // E-01: Registrar gasto desde Movimientos (elige el destino en el formulario).
   const registerExpense = (label: string) => (
-    <Button icon="plus" disabled title="Disponible próximamente">
+    <ButtonLink icon="plus" to="/gastos/nuevo">
       {label}
-    </Button>
+    </ButtonLink>
   );
 
   const header = (
     <Head>
       <div>
         <h1>Movimientos</h1>
-        <p>Dinero que ya entró o salió.</p>
+        <p>Dinero que actualmente cuenta como recibido o gastado.</p>
       </div>
-      {registerExpense('Registrar gasto')}
+      <HeadActions>
+        <ActionLink to="/movimientos/historial">Historial de correcciones</ActionLink>
+        {registerExpense('Registrar gasto')}
+      </HeadActions>
     </Head>
   );
 
@@ -229,6 +256,11 @@ export function MovementsPage() {
   return (
     <Page>
       {header}
+      {result ? (
+        <Notice tone="success" title={result.title} onClose={dismiss}>
+          {result.body}
+        </Notice>
+      ) : null}
       <Search>
         <SearchField
           value={search}

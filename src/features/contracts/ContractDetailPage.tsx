@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NotesSection } from '@features/notes/NotesSection';
 import { Link, useNavigate, useParams } from 'react-router';
 import styled from 'styled-components';
 import type { Contract } from '@api/contracts';
@@ -164,6 +165,11 @@ function ContractActions({ contract }: { contract: Contract }) {
     label: 'Editar contrato',
     onSelect: () => void navigate(`/contratos/${contract.id}/editar`),
   };
+  // E-02: gasto de su unidad con el contrato como referencia.
+  const expense = {
+    label: 'Registrar gasto',
+    onSelect: () => void navigate(`/gastos/nuevo?contrato=${contract.id}`),
+  };
   if (contract.status === 'expired' && contract.is_current) {
     return (
       <Actions>
@@ -176,7 +182,7 @@ function ContractActions({ contract }: { contract: Contract }) {
         <Button variant="secondary" onClick={() => setTerminating(true)}>
           Terminar y desocupar
         </Button>
-        <ActionMenu items={[edit]} />
+        <ActionMenu items={[edit, expense]} />
         {dialog}
       </Actions>
     );
@@ -190,6 +196,7 @@ function ContractActions({ contract }: { contract: Contract }) {
         <ActionMenu
           items={[
             edit,
+            expense,
             { label: 'Terminar y desocupar', danger: true, onSelect: () => setTerminating(true) },
           ]}
         />
@@ -320,6 +327,10 @@ export function ContractDetailPage() {
         </Data>
       </DetailSection>
       <ContractPayments contract={contract} />
+      <NotesSection
+        target={{ target_type: 'contract', target_id: contract.id }}
+        label="este contrato"
+      />
     </Page>
   );
 }
